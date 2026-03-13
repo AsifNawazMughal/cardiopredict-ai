@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CardioPredict AI — Complete Study Manual</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --red-mid: #fee2e2;
+    --blue: #1d4ed8;
+    --blue-light: #eff6ff;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+    --yellow: #ca8a04;
+    --yellow-light: #fefce8;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--gray-900);
+    background: white;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px;
+  }
+
+  /* ---- COVER PAGE ---- */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    page-break-after: always;
+    padding: 60px 40px;
+  }
+  .cover-logo {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #dc2626, #9b1c1c);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(220,38,38,0.3);
+  }
+  .cover h1 {
+    font-size: 42px; font-weight: 800; color: var(--gray-900);
+    line-height: 1.2; margin-bottom: 12px;
+  }
+  .cover h1 span { color: var(--red); }
+  .cover .subtitle {
+    font-size: 18px; color: var(--gray-500); margin-bottom: 40px;
+    font-weight: 400;
+  }
+  .cover-meta {
+    display: flex; gap: 30px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 50px;
+  }
+  .cover-badge {
+    background: var(--gray-100); border-radius: 10px;
+    padding: 10px 20px; font-size: 13px; color: var(--gray-700);
+    font-weight: 500;
+  }
+  .cover-badge span { font-weight: 700; color: var(--red); }
+  .cover-desc {
+    max-width: 600px; font-size: 15px; color: var(--gray-500);
+    line-height: 1.8; border-top: 2px solid var(--gray-200);
+    padding-top: 30px; margin-top: 10px;
+  }
+
+  /* ---- TABLE OF CONTENTS ---- */
+  .toc { page-break-after: always; padding: 40px 0; }
+  .toc h2 { font-size: 28px; font-weight: 700; margin-bottom: 30px; color: var(--gray-900); }
+  .toc-section { margin-bottom: 8px; }
+  .toc-chapter {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; border-radius: 8px;
+    font-weight: 600; font-size: 15px;
+    color: var(--gray-700); cursor: default;
+    transition: background 0.2s;
+  }
+  .toc-chapter:hover { background: var(--gray-100); }
+  .toc-chapter .num {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--red); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .toc-chapter .dots { flex: 1; border-bottom: 2px dotted var(--gray-300); height: 10px; }
+  .toc-sub {
+    margin-left: 48px; padding: 4px 10px;
+    font-size: 13px; color: var(--gray-500);
+  }
+
+  /* ---- CHAPTERS ---- */
+  .chapter { page-break-before: always; padding: 20px 0; }
+  .chapter-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 32px; padding-bottom: 20px;
+    border-bottom: 3px solid var(--gray-200);
+  }
+  .chapter-num {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--red), #9b1c1c);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(220,38,38,0.25);
+  }
+  .chapter-header h2 {
+    font-size: 26px; font-weight: 800; color: var(--gray-900);
+    line-height: 1.2;
+  }
+  .chapter-header p { font-size: 14px; color: var(--gray-500); margin-top: 2px; }
+
+  h3 {
+    font-size: 18px; font-weight: 700; color: var(--gray-900);
+    margin: 30px 0 12px;
+    padding-left: 12px;
+    border-left: 4px solid var(--red);
+  }
+  h4 {
+    font-size: 15px; font-weight: 600; color: var(--gray-700);
+    margin: 20px 0 8px;
+  }
+  p { margin-bottom: 14px; color: var(--gray-700); }
+  ul, ol { margin: 0 0 16px 22px; }
+  li { margin-bottom: 6px; color: var(--gray-700); }
+  strong { color: var(--gray-900); }
+
+  /* ---- CALLOUT BOXES ---- */
+  .callout {
+    border-radius: 12px; padding: 18px 20px; margin: 20px 0;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .callout-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body h4 { margin: 0 0 4px; font-size: 14px; }
+  .callout-body p { margin: 0; font-size: 14px; }
+  .callout.info { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .callout.info .callout-body h4 { color: var(--blue); }
+  .callout.tip { background: var(--green-light); border-left: 4px solid var(--green); }
+  .callout.tip .callout-body h4 { color: var(--green); }
+  .callout.warn { background: var(--yellow-light); border-left: 4px solid var(--yellow); }
+  .callout.warn .callout-body h4 { color: var(--yellow); }
+  .callout.key { background: var(--purple-light); border-left: 4px solid var(--purple); }
+  .callout.key .callout-body h4 { color: var(--purple); }
+
+  /* ---- CODE ---- */
+  pre {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 12px;
+    padding: 20px; overflow-x: auto; margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    line-height: 1.6; border: 1px solid #313244;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--gray-100); padding: 2px 7px;
+    border-radius: 5px; font-size: 13px; color: var(--red);
+  }
+  pre code { background: none; padding: 0; color: inherit; font-size: 13px; }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; }
+  .cm { color: #6c7086; font-style: italic; }
+  .num { color: #fab387; }
+  .cls { color: #f9e2af; }
+
+  /* ---- DIAGRAM / FLOW ---- */
+  .flow {
+    display: flex; align-items: center; gap: 0;
+    flex-wrap: wrap; margin: 20px 0;
+  }
+  .flow-box {
+    background: white; border: 2px solid var(--gray-200);
+    border-radius: 10px; padding: 10px 16px;
+    text-align: center; font-size: 13px; font-weight: 600;
+    color: var(--gray-700); min-width: 100px;
+  }
+  .flow-box.red { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .flow-box.blue { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .flow-box.green { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .flow-box.purple { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+  .arrow { font-size: 20px; color: var(--gray-400); padding: 0 6px; }
+
+  /* ---- TABLE ---- */
+  table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 14px;
+  }
+  th {
+    background: var(--gray-900); color: white;
+    padding: 10px 14px; text-align: left; font-weight: 600;
+  }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child  { border-radius: 0 8px 0 0; }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--gray-200); }
+  tr:nth-child(even) td { background: var(--gray-50); }
+  tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+  tr:last-child td:last-child  { border-radius: 0 0 8px 0; }
+
+  /* ---- CARDS ---- */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .card {
+    border: 1.5px solid var(--gray-200); border-radius: 12px;
+    padding: 18px; background: var(--gray-50);
+  }
+  .card-icon { font-size: 28px; margin-bottom: 8px; }
+  .card h4 { font-size: 14px; font-weight: 700; margin: 0 0 6px; color: var(--gray-900); }
+  .card p { font-size: 13px; margin: 0; color: var(--gray-500); }
+
+  /* ---- FORMULA ---- */
+  .formula {
+    background: var(--gray-900); color: #f8f8f2;
+    border-radius: 10px; padding: 16px 20px;
+    text-align: center; font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; margin: 16px 0;
+  }
+
+  /* ---- ARCHITECTURE ---- */
+  .arch {
+    border: 2px solid var(--gray-200); border-radius: 14px;
+    overflow: hidden; margin: 20px 0;
+  }
+  .arch-row {
+    display: flex; align-items: stretch;
+    border-bottom: 2px solid var(--gray-200);
+  }
+  .arch-row:last-child { border-bottom: none; }
+  .arch-label {
+    width: 130px; flex-shrink: 0;
+    background: var(--gray-900); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; text-align: center;
+    padding: 12px 8px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .arch-content {
+    flex: 1; padding: 14px 18px;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  }
+  .arch-tag {
+    background: white; border: 1.5px solid var(--gray-300);
+    border-radius: 7px; padding: 5px 12px;
+    font-size: 12px; font-weight: 600; color: var(--gray-700);
+  }
+  .arch-tag.red { border-color: var(--red); color: var(--red); background: var(--red-light); }
+  .arch-tag.blue { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+  .arch-tag.green { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .arch-tag.purple { border-color: var(--purple); color: var(--purple); background: var(--purple-light); }
+
+  /* ---- PRINT ---- */
+  @media print {
+    body { padding: 20px 30px; font-size: 13px; }
+    .cover { min-height: auto; padding: 40px 20px; }
+    .chapter { page-break-before: always; }
+    pre { font-size: 11px; }
+    .cards { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ---- PRINT BUTTON ---- */
+  .print-btn {
+    position: fixed; top: 20px; right: 20px;
+    background: var(--red); color: white;
+    border: none; padding: 12px 24px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(220,38,38,0.3);
+    font-family: 'Inter', sans-serif;
+    z-index: 999;
+  }
+  .print-btn:hover { background: #b91c1c; }
+  @media print { .print-btn { display: none; } }
+
+  .divider { border: none; border-top: 2px solid var(--gray-200); margin: 28px 0; }
+  .tag { display: inline-block; background: var(--red-light); color: var(--red); border-radius: 5px; padding: 2px 8px; font-size: 12px; font-weight: 600; margin-right: 5px; }
+  .tag.blue { background: var(--blue-light); color: var(--blue); }
+  .tag.green { background: var(--green-light); color: var(--green); }
+  .tag.purple { background: var(--purple-light); color: var(--purple); }
+
+  /* NN diagram */
+  .nn-diagram {
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 24px; background: var(--gray-50); border-radius: 12px;
+    border: 2px solid var(--gray-200); margin: 16px 0; gap: 20px;
+  }
+  .nn-layer { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .nn-layer-label { font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; }
+  .nn-node {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .nn-node.inp { background: var(--blue-light); border: 2px solid var(--blue); color: var(--blue); }
+  .nn-node.hid { background: var(--purple-light); border: 2px solid var(--purple); color: var(--purple); }
+  .nn-node.out { background: var(--red-light); border: 2px solid var(--red); color: var(--red); }
+  .nn-arrows { color: var(--gray-300); font-size: 28px; align-self: center; }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">🖨️ Save as PDF</button>
+
+<!-- ======================================================= COVER -->
+<div class="cover">
+  <div class="cover-logo">❤️</div>
+  <h1>CardioPredict <span>AI</span><br>Complete Study Manual</h1>
+  <p class="subtitle">Machine Learning · Full-Stack Web Development · Final Year Project (CS619)</p>
+  <div class="cover-meta">
+    <div class="cover-badge">Subject <span>CS619 — FYP</span></div>
+    <div class="cover-badge">Stack <span>Next.js + FastAPI + TensorFlow</span></div>
+    <div class="cover-badge">Database <span>MySQL</span></div>
+    <div class="cover-badge">Year <span>2026</span></div>
+  </div>
+  <p class="cover-desc">
+    This manual explains everything from scratch — what machine learning is, how AI models work,
+    how the backend API was built, how the frontend connects to it, and how every piece of this
+    heart disease prediction system fits together. Written for students with frontend knowledge
+    who want to understand the full picture.
+  </p>
+</div>
+
+<!-- ======================================================= TOC -->
+<div class="toc">
+  <h2>📋 Table of Contents</h2>
+
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">1</span> What Is Machine Learning?<span class="dots"></span> Chapter 1</div>
+    <div class="toc-sub">1.1 Types of ML &nbsp;·&nbsp; 1.2 Supervised Learning &nbsp;·&nbsp; 1.3 Classification</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">2</span> The Three ML Models in This Project<span class="dots"></span> Chapter 2</div>
+    <div class="toc-sub">2.1 Logistic Regression &nbsp;·&nbsp; 2.2 Random Forest &nbsp;·&nbsp; 2.3 ANN (Neural Network)</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">3</span> The Dataset — UCI Heart Disease<span class="dots"></span> Chapter 3</div>
+    <div class="toc-sub">3.1 Features &nbsp;·&nbsp; 3.2 Target Variable &nbsp;·&nbsp; 3.3 Preprocessing</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">4</span> How The Models Were Trained<span class="dots"></span> Chapter 4</div>
+    <div class="toc-sub">4.1 train_model.py &nbsp;·&nbsp; 4.2 Accuracy &nbsp;·&nbsp; 4.3 Saving Models</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">5</span> System Architecture<span class="dots"></span> Chapter 5</div>
+    <div class="toc-sub">5.1 Full Stack Overview &nbsp;·&nbsp; 5.2 Request Flow &nbsp;·&nbsp; 5.3 Folder Structure</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">6</span> The Backend — FastAPI<span class="dots"></span> Chapter 6</div>
+    <div class="toc-sub">6.1 Routes &amp; Controllers &nbsp;·&nbsp; 6.2 JWT Auth &nbsp;·&nbsp; 6.3 Database Models</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">7</span> The Frontend — Next.js<span class="dots"></span> Chapter 7</div>
+    <div class="toc-sub">7.1 App Router &nbsp;·&nbsp; 7.2 API Client &nbsp;·&nbsp; 7.3 Pages Overview</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">8</span> The Database — MySQL<span class="dots"></span> Chapter 8</div>
+    <div class="toc-sub">8.1 Schema &nbsp;·&nbsp; 8.2 SQLAlchemy ORM &nbsp;·&nbsp; 8.3 Relationships</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">9</span> How To Run The Project<span class="dots"></span> Chapter 9</div>
+    <div class="toc-sub">9.1 Backend &nbsp;·&nbsp; 9.2 Frontend &nbsp;·&nbsp; 9.3 Troubleshooting</div>
+  </div>
+  <div class="toc-section">
+    <div class="toc-chapter"><span class="num">10</span> Key Concepts Glossary<span class="dots"></span> Chapter 10</div>
+  </div>
+</div>
+
+<!-- ======================================================= CH 1 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">1</div>
+    <div>
+      <h2>What Is Machine Learning?</h2>
+      <p>Understanding AI from first principles</p>
+    </div>
+  </div>
+
+  <p>Machine learning (ML) is a way of teaching computers to learn from data, instead of writing rules manually. Instead of saying <em>"if cholesterol &gt; 240 then risk is high"</em>, you feed the computer thousands of patient records and it figures out the rules itself.</p>
+
+  <div class="callout info">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body">
+      <h4>Simple Analogy</h4>
+      <p>Imagine showing a child 1,000 photos of cats and dogs and saying "cat" or "dog" for each. After enough examples, the child learns what makes a cat a cat — without you ever explaining whiskers or ears explicitly. ML works the same way.</p>
+    </div>
+  </div>
+
+  <h3>1.1 Types of Machine Learning</h3>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🏷️</div>
+      <h4>Supervised Learning</h4>
+      <p>Training on labeled data — each example has an input AND a known correct answer. <strong>This is what we use.</strong></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h4>Unsupervised Learning</h4>
+      <p>Finding patterns in unlabeled data. No correct answers given — the model groups similar things together.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎮</div>
+      <h4>Reinforcement Learning</h4>
+      <p>Learning by trial and error with rewards and penalties. Used in game-playing AI like AlphaGo.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔁</div>
+      <h4>Semi-Supervised</h4>
+      <p>A mix of labeled and unlabeled data. Useful when labeling data is expensive or time-consuming.</p>
+    </div>
+  </div>
+
+  <h3>1.2 Supervised Learning in Detail</h3>
+  <p>In supervised learning, we have a <strong>training dataset</strong> — rows of data where each row is one patient with known features (age, cholesterol, blood pressure…) and a known label (has heart disease: yes or no).</p>
+
+  <div class="flow" style="justify-content:center;">
+    <div class="flow-box blue">Training Data<br><small>(features + labels)</small></div>
+    <span class="arrow">→</span>
+    <div class="flow-box purple">ML Algorithm<br><small>(learns patterns)</small></div>
+    <span class="arrow">→</span>
+    <div class="flow-box red">Trained Model<br><small>(can predict)</small></div>
+    <span class="arrow">→</span>
+    <div class="flow-box green">New Patient<br><small>(gets prediction)</small></div>
+  </div>
+
+  <h3>1.3 Classification vs Regression</h3>
+  <table>
+    <tr><th>Type</th><th>Output</th><th>Example</th></tr>
+    <tr><td><strong>Classification</strong></td><td>A category (Yes/No, Cat/Dog)</td><td>Has heart disease? → Yes or No ✅ (our project)</td></tr>
+    <tr><td>Regression</td><td>A number</td><td>What will be the house price? → ₹45 lakh</td></tr>
+  </table>
+
+  <p>Our project is a <strong>binary classification</strong> problem — the model outputs either <code>0</code> (no disease) or <code>1</code> (has disease), along with a confidence percentage.</p>
+
+  <h3>1.4 Model Evaluation</h3>
+  <p>How do we know if our model is good? We split data into:</p>
+  <ul>
+    <li><strong>Training set (80%)</strong> — The model learns from this</li>
+    <li><strong>Test set (20%)</strong> — Never shown to the model during training; used to check real-world performance</li>
+  </ul>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h4>Accuracy</h4>
+      <p>Percentage of correct predictions out of all predictions. Our ANN achieved <strong>67.2%</strong>.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <h4>ROC-AUC Score</h4>
+      <p>Measures how well the model separates classes. Ranges 0.5–1.0. Our ANN: <strong>0.86</strong> (excellent).</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎗️</div>
+      <h4>Precision</h4>
+      <p>Of all patients predicted as "sick", how many actually were? Avoids false alarms.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔎</div>
+      <h4>Recall</h4>
+      <p>Of all actually sick patients, how many did we catch? Critical for medical AI — missing sick people is dangerous.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================= CH 2 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">2</div>
+    <div>
+      <h2>The Three ML Models in This Project</h2>
+      <p>Logistic Regression · Random Forest · Artificial Neural Network</p>
+    </div>
+  </div>
+
+  <h3>2.1 Logistic Regression</h3>
+  <p>Despite the name having "regression" in it, <strong>Logistic Regression is a classification algorithm</strong>. It calculates a probability (0 to 1) that a patient has heart disease.</p>
+
+  <div class="formula">
+    P(disease) = 1 / (1 + e^−(w₁x₁ + w₂x₂ + ... + wₙxₙ + b))
+  </div>
+
+  <p>Each feature (age, cholesterol, etc.) gets a <strong>weight (w)</strong>. A high positive weight means that feature strongly predicts disease. The sigmoid function squishes the result into a probability between 0 and 1.</p>
+
+  <div class="callout tip">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body">
+      <h4>Why use it?</h4>
+      <p>Fast to train, easy to interpret, works well as a baseline. Doctors can understand "age has a weight of 0.3" — it's explainable.</p>
+    </div>
+  </div>
+
+  <h3>2.2 Random Forest</h3>
+  <p>Random Forest is an <strong>ensemble method</strong> — it builds many decision trees and combines their votes. Each tree is trained on a random subset of the data and features.</p>
+
+  <div class="nn-diagram" style="justify-content: center; gap: 30px;">
+    <div style="text-align:center">
+      <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;">INPUT</div>
+      <div style="background:#eff6ff;border:2px solid #1d4ed8;border-radius:8px;padding:10px 14px;font-size:12px;color:#1d4ed8;font-weight:600;">Patient Data</div>
+    </div>
+    <div style="font-size:24px;color:#d1d5db;">→</div>
+    <div style="text-align:center">
+      <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;">100 TREES</div>
+      <div style="display:flex;gap:8px;">
+        <div style="background:#f5f3ff;border:2px solid #7c3aed;border-radius:8px;padding:8px;font-size:11px;color:#7c3aed;font-weight:600;">🌳 Tree 1<br>→ YES</div>
+        <div style="background:#f5f3ff;border:2px solid #7c3aed;border-radius:8px;padding:8px;font-size:11px;color:#7c3aed;font-weight:600;">🌳 Tree 2<br>→ YES</div>
+        <div style="background:#f5f3ff;border:2px solid #7c3aed;border-radius:8px;padding:8px;font-size:11px;color:#7c3aed;font-weight:600;">🌳 Tree 3<br>→ NO</div>
+      </div>
+    </div>
+    <div style="font-size:24px;color:#d1d5db;">→</div>
+    <div style="text-align:center">
+      <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;">VOTE</div>
+      <div style="background:#fef2f2;border:2px solid #dc2626;border-radius:8px;padding:10px 14px;font-size:12px;color:#dc2626;font-weight:600;">Majority → YES<br>68% confidence</div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">🌲</span>
+    <div class="callout-body">
+      <h4>Why use it?</h4>
+      <p>Very accurate, handles missing data well, resistant to overfitting. One of the best "off-the-shelf" algorithms for medical prediction.</p>
+    </div>
+  </div>
+
+  <h3>2.3 Artificial Neural Network (ANN)</h3>
+  <p>An ANN is inspired by the human brain. It consists of layers of <strong>neurons</strong> (mathematical functions) connected to each other.</p>
+
+  <div class="nn-diagram">
+    <div class="nn-layer">
+      <div class="nn-layer-label">Input Layer<br>(13 features)</div>
+      <div class="nn-node inp">x₁</div>
+      <div class="nn-node inp">x₂</div>
+      <div class="nn-node inp">x₃</div>
+      <div style="font-size:18px;color:#6b7280">⋮</div>
+      <div class="nn-node inp">x₁₃</div>
+    </div>
+    <div class="nn-arrows">→</div>
+    <div class="nn-layer">
+      <div class="nn-layer-label">Hidden Layer 1<br>(64 neurons)</div>
+      <div class="nn-node hid">h</div>
+      <div class="nn-node hid">h</div>
+      <div class="nn-node hid">h</div>
+      <div class="nn-node hid">h</div>
+      <div style="font-size:18px;color:#6b7280">⋮</div>
+    </div>
+    <div class="nn-arrows">→</div>
+    <div class="nn-layer">
+      <div class="nn-layer-label">Hidden Layer 2<br>(32 neurons)</div>
+      <div class="nn-node hid">h</div>
+      <div class="nn-node hid">h</div>
+      <div class="nn-node hid">h</div>
+      <div style="font-size:18px;color:#6b7280">⋮</div>
+    </div>
+    <div class="nn-arrows">→</div>
+    <div class="nn-layer">
+      <div class="nn-layer-label">Output Layer<br>(1 neuron)</div>
+      <div class="nn-node out">P</div>
+      <div style="font-size:11px;color:#dc2626;margin-top:4px;text-align:center">0.0 – 1.0<br>probability</div>
+    </div>
+  </div>
+
+  <h4>How a neuron works</h4>
+  <div class="formula">output = activation( w₁·x₁ + w₂·x₂ + ... + b )</div>
+  <p>Each neuron takes inputs, multiplies them by weights, adds a bias, then passes through an <strong>activation function</strong> (like ReLU: max(0, x)) to introduce non-linearity.</p>
+
+  <h4>Training process (Backpropagation)</h4>
+  <ol>
+    <li><strong>Forward pass</strong> — Input flows through the network, producing an output</li>
+    <li><strong>Calculate loss</strong> — Compare output to true label using Binary Cross-Entropy</li>
+    <li><strong>Backward pass</strong> — Calculate how much each weight contributed to the error</li>
+    <li><strong>Update weights</strong> — Adjust weights slightly using the Adam optimizer</li>
+    <li><strong>Repeat</strong> — For 100 epochs (full passes through the data)</li>
+  </ol>
+
+  <div class="callout key">
+    <span class="callout-icon">🧠</span>
+    <div class="callout-body">
+      <h4>Why use an ANN?</h4>
+      <p>ANNs can learn complex non-linear relationships in data that simpler models miss. They are the foundation of modern deep learning (ChatGPT, image recognition, etc.).</p>
+    </div>
+  </div>
+
+  <h3>2.4 Comparison of the Three Models</h3>
+  <table>
+    <tr><th>Model</th><th>Accuracy</th><th>ROC-AUC</th><th>Speed</th><th>Interpretability</th></tr>
+    <tr><td>Logistic Regression</td><td>~82%</td><td>~0.87</td><td>Very Fast</td><td>High (weights visible)</td></tr>
+    <tr><td>Random Forest</td><td>~85%</td><td>~0.90</td><td>Fast</td><td>Medium (feature importance)</td></tr>
+    <tr><td>ANN (TensorFlow)</td><td>67.2%</td><td>0.86</td><td>Slow (training)</td><td>Low (black box)</td></tr>
+  </table>
+  <p style="font-size:13px;color:var(--gray-500)">Note: ANN accuracy is lower here due to the small dataset size (~300 records). ANNs shine with much larger datasets (100k+ records).</p>
+</div>
+
+<!-- ======================================================= CH 3 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">3</div>
+    <div>
+      <h2>The Dataset — UCI Heart Disease</h2>
+      <p>Understanding what data the models learn from</p>
+    </div>
+  </div>
+
+  <p>The models are trained on the <strong>UCI Heart Disease Dataset</strong> (Cleveland), one of the most widely used medical datasets in ML research. It contains <strong>303 patient records</strong> with 13 clinical features.</p>
+
+  <h3>3.1 The 13 Input Features</h3>
+  <table>
+    <tr><th>#</th><th>Feature Name</th><th>Description</th><th>Type</th></tr>
+    <tr><td>1</td><td><code>age</code></td><td>Patient's age in years</td><td>Number</td></tr>
+    <tr><td>2</td><td><code>sex</code></td><td>1 = male, 0 = female</td><td>Binary</td></tr>
+    <tr><td>3</td><td><code>cp</code></td><td>Chest pain type (0–3): 0=typical angina, 1=atypical, 2=non-anginal, 3=asymptomatic</td><td>Category</td></tr>
+    <tr><td>4</td><td><code>trestbps</code></td><td>Resting blood pressure (mm Hg)</td><td>Number</td></tr>
+    <tr><td>5</td><td><code>chol</code></td><td>Serum cholesterol (mg/dl)</td><td>Number</td></tr>
+    <tr><td>6</td><td><code>fbs</code></td><td>Fasting blood sugar &gt; 120 mg/dl (1=true, 0=false)</td><td>Binary</td></tr>
+    <tr><td>7</td><td><code>restecg</code></td><td>Resting ECG results (0–2)</td><td>Category</td></tr>
+    <tr><td>8</td><td><code>thalach</code></td><td>Maximum heart rate achieved</td><td>Number</td></tr>
+    <tr><td>9</td><td><code>exang</code></td><td>Exercise-induced angina (1=yes, 0=no)</td><td>Binary</td></tr>
+    <tr><td>10</td><td><code>oldpeak</code></td><td>ST depression induced by exercise</td><td>Number</td></tr>
+    <tr><td>11</td><td><code>slope</code></td><td>Slope of peak exercise ST segment (0–2)</td><td>Category</td></tr>
+    <tr><td>12</td><td><code>ca</code></td><td>Number of major vessels (0–3) colored by fluoroscopy</td><td>Number</td></tr>
+    <tr><td>13</td><td><code>thal</code></td><td>Thalassemia: 1=normal, 2=fixed defect, 3=reversible defect</td><td>Category</td></tr>
+  </table>
+
+  <h3>3.2 Target Variable</h3>
+  <p>The original dataset has values 0–4, but we convert it to binary:</p>
+  <ul>
+    <li><strong>0</strong> → No heart disease</li>
+    <li><strong>1, 2, 3, or 4</strong> → Has heart disease (converted to 1)</li>
+  </ul>
+
+  <h3>3.3 Data Preprocessing Steps</h3>
+  <p>Raw data must be cleaned and prepared before feeding to ML models:</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🗑️</div>
+      <h4>1. Remove Missing Values</h4>
+      <p>Drop rows where any feature is missing. The UCI dataset uses <code>?</code> for missing values — pandas drops these.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚖️</div>
+      <h4>2. Feature Scaling</h4>
+      <p>Age (20–80) and cholesterol (100–400) are on different scales. StandardScaler normalizes them to mean=0, std=1.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">✂️</div>
+      <h4>3. Train/Test Split</h4>
+      <p>80% training, 20% testing. <code>random_state=42</code> ensures reproducible splits every run.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔢</div>
+      <h4>4. Binary Target</h4>
+      <p>Convert multi-class target (0–4) to binary (0 or 1) for classification.</p>
+    </div>
+  </div>
+
+  <h4>The actual preprocessing code:</h4>
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+<span class="cm"># Load the UCI dataset</span>
+df = pd.read_csv(<span class="str">"heart_disease.csv"</span>)
+
+<span class="cm"># Remove missing values (marked as '?')</span>
+df = df.replace(<span class="str">'?'</span>, pd.NA).dropna()
+
+<span class="cm"># Convert target to binary: 0 = no disease, 1 = disease</span>
+df[<span class="str">'target'</span>] = (df[<span class="str">'target'</span>] > <span class="num">0</span>).astype(int)
+
+<span class="cm"># Split features and label</span>
+X = df.drop(<span class="str">'target'</span>, axis=<span class="num">1</span>)
+y = df[<span class="str">'target'</span>]
+
+<span class="cm"># Normalize features (very important for ANN!)</span>
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+<span class="cm"># 80/20 split</span>
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>
+)</code></pre>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body">
+      <h4>Why is scaling important for ANN but less for Random Forest?</h4>
+      <p>ANN uses gradient descent — large feature values create large gradients and slow/unstable training. Random Forest uses decision trees that split on thresholds, so scale doesn't matter.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================= CH 4 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">4</div>
+    <div>
+      <h2>How The Models Were Trained</h2>
+      <p>The actual training code explained line by line</p>
+    </div>
+  </div>
+
+  <h3>4.1 Training Logistic Regression</h3>
+<pre><code><span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> <span class="cls">LogisticRegression</span>
+
+lr_model = <span class="cls">LogisticRegression</span>(max_iter=<span class="num">1000</span>)
+lr_model.fit(X_train, y_train)  <span class="cm"># Learn weights</span>
+
+<span class="cm"># Get predictions</span>
+y_pred = lr_model.predict(X_test)
+y_prob = lr_model.predict_proba(X_test)[:, <span class="num">1</span>]  <span class="cm"># Probability of class 1</span></code></pre>
+
+  <h3>4.2 Training Random Forest</h3>
+<pre><code><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> <span class="cls">RandomForestClassifier</span>
+
+rf_model = <span class="cls">RandomForestClassifier</span>(
+    n_estimators=<span class="num">100</span>,  <span class="cm"># 100 decision trees</span>
+    random_state=<span class="num">42</span>
+)
+rf_model.fit(X_train, y_train)
+
+y_pred = rf_model.predict(X_test)
+y_prob = rf_model.predict_proba(X_test)[:, <span class="num">1</span>]</code></pre>
+
+  <h3>4.3 Training the ANN with TensorFlow</h3>
+<pre><code><span class="kw">import</span> tensorflow <span class="kw">as</span> tf
+<span class="kw">from</span> tensorflow.keras <span class="kw">import</span> layers, models
+
+<span class="cm"># Define the network architecture</span>
+model = models.Sequential([
+    layers.Dense(<span class="num">64</span>, activation=<span class="str">'relu'</span>, input_shape=(<span class="num">13</span>,)),  <span class="cm"># 64 neurons, ReLU</span>
+    layers.Dropout(<span class="num">0.3</span>),                                    <span class="cm"># Prevents overfitting</span>
+    layers.Dense(<span class="num">32</span>, activation=<span class="str">'relu'</span>),                    <span class="cm"># 32 neurons</span>
+    layers.Dropout(<span class="num">0.2</span>),
+    layers.Dense(<span class="num">1</span>, activation=<span class="str">'sigmoid'</span>)                   <span class="cm"># Output: probability</span>
+])
+
+<span class="cm"># Compile: how to measure error and how to fix it</span>
+model.compile(
+    optimizer=<span class="str">'adam'</span>,                    <span class="cm"># Smart gradient descent</span>
+    loss=<span class="str">'binary_crossentropy'</span>,           <span class="cm"># Loss function for binary classification</span>
+    metrics=[<span class="str">'accuracy'</span>]
+)
+
+<span class="cm"># Train for 100 full passes through the data</span>
+history = model.fit(
+    X_train, y_train,
+    epochs=<span class="num">100</span>,
+    batch_size=<span class="num">32</span>,
+    validation_split=<span class="num">0.1</span>,
+    verbose=<span class="num">1</span>
+)</code></pre>
+
+  <h3>4.4 Saving and Loading Models</h3>
+  <p>After training, models are saved to disk using <code>joblib</code> (sklearn) and TensorFlow's built-in save:</p>
+<pre><code><span class="kw">import</span> joblib
+
+<span class="cm"># Save sklearn models</span>
+joblib.dump(lr_model,  <span class="str">'models/logistic_regression.pkl'</span>)
+joblib.dump(rf_model,  <span class="str">'models/random_forest.pkl'</span>)
+joblib.dump(scaler,    <span class="str">'models/scaler.pkl'</span>)
+
+<span class="cm"># Save TensorFlow ANN</span>
+model.save(<span class="str">'models/ann_model.keras'</span>)
+
+<span class="cm"># ---- Later, to load and predict ----</span>
+lr = joblib.load(<span class="str">'models/logistic_regression.pkl'</span>)
+scaler = joblib.load(<span class="str">'models/scaler.pkl'</span>)
+
+<span class="cm"># New patient data (must match the 13 features)</span>
+new_patient = [[<span class="num">54</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">130</span>, <span class="num">245</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">150</span>, <span class="num">0</span>, <span class="num">2.3</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">2</span>]]
+new_scaled = scaler.transform(new_patient)
+probability = lr.predict_proba(new_scaled)[<span class="num">0</span>][<span class="num">1</span>]  <span class="cm"># 0.73 = 73% chance of disease</span></code></pre>
+
+  <div class="callout info">
+    <span class="callout-icon">📁</span>
+    <div class="callout-body">
+      <h4>Where are the model files?</h4>
+      <p>After running <code>python train_model.py</code> in the backend folder, the following files are created: <code>backend/models/logistic_regression.pkl</code>, <code>random_forest.pkl</code>, <code>scaler.pkl</code>, and <code>ann_model.keras</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================= CH 5 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">5</div>
+    <div>
+      <h2>System Architecture</h2>
+      <p>How all the pieces connect together</p>
+    </div>
+  </div>
+
+  <h3>5.1 Full Stack Overview</h3>
+  <div class="arch">
+    <div class="arch-row">
+      <div class="arch-label">Browser</div>
+      <div class="arch-content">
+        <span class="arch-tag blue">Doctor opens app in Chrome/Firefox</span>
+        <span class="arch-tag">localhost:3001</span>
+        <span class="arch-tag blue">React renders the UI</span>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-label">Frontend<br>(Next.js)</div>
+      <div class="arch-content">
+        <span class="arch-tag blue">app/(auth)/login</span>
+        <span class="arch-tag blue">app/(dashboard)/dashboard</span>
+        <span class="arch-tag blue">app/(dashboard)/predict</span>
+        <span class="arch-tag blue">app/(dashboard)/patients</span>
+        <span class="arch-tag blue">app/(dashboard)/history</span>
+        <span class="arch-tag blue">app/(dashboard)/results/[id]</span>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-label">API Layer</div>
+      <div class="arch-content">
+        <span class="arch-tag">HTTP/JSON</span>
+        <span class="arch-tag">JWT Bearer Token</span>
+        <span class="arch-tag">localhost:8000</span>
+        <span class="arch-tag">CORS enabled</span>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-label">Backend<br>(FastAPI)</div>
+      <div class="arch-content">
+        <span class="arch-tag red">routes/auth.py</span>
+        <span class="arch-tag red">routes/patients.py</span>
+        <span class="arch-tag red">routes/predictions.py</span>
+        <span class="arch-tag red">controllers/auth_controller.py</span>
+        <span class="arch-tag red">controllers/prediction_controller.py</span>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-label">ML Layer</div>
+      <div class="arch-content">
+        <span class="arch-tag purple">ANN (TensorFlow)</span>
+        <span class="arch-tag purple">Random Forest (sklearn)</span>
+        <span class="arch-tag purple">Logistic Regression (sklearn)</span>
+        <span class="arch-tag purple">StandardScaler</span>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-label">Database<br>(MySQL)</div>
+      <div class="arch-content">
+        <span class="arch-tag green">users table</span>
+        <span class="arch-tag green">patients table</span>
+        <span class="arch-tag green">predictions table</span>
+        <span class="arch-tag green">SQLAlchemy ORM</span>
+        <span class="arch-tag green">heart_disease_db</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>5.2 Request Flow: Making a Prediction</h3>
+  <p>What happens step by step when a doctor clicks "Get Prediction":</p>
+  <ol>
+    <li><strong>Doctor fills form</strong> on <code>/predict</code> page (age, cholesterol, etc.)</li>
+    <li><strong>React calls</strong> <code>predictionsApi.predict(data)</code> in <code>app/lib/api.js</code></li>
+    <li><strong>HTTP POST request</strong> sent to <code>http://localhost:8000/api/predictions/predict</code> with JWT token in header</li>
+    <li><strong>FastAPI route</strong> in <code>routes/predictions.py</code> receives the request, verifies JWT</li>
+    <li><strong>Controller</strong> in <code>controllers/prediction_controller.py</code> loads the ML model from disk</li>
+    <li><strong>Scaler normalizes</strong> the 13 input features using the saved StandardScaler</li>
+    <li><strong>ML model predicts</strong> — returns probability (e.g., 0.73)</li>
+    <li><strong>Result saved</strong> to MySQL <code>predictions</code> table</li>
+    <li><strong>JSON response</strong> sent back: <code>{"prediction": 1, "confidence": 73.0, "risk_level": "High"}</code></li>
+    <li><strong>React navigates</strong> to <code>/results/[id]</code> and displays charts and recommendations</li>
+  </ol>
+
+  <h3>5.3 Folder Structure</h3>
+<pre><code>Heart Disease Prediction/
+├── backend/
+│   ├── main.py                    <span class="cm"># FastAPI app entry point</span>
+│   ├── database/
+│   │   ├── connection.py          <span class="cm"># MySQL connection (SQLAlchemy)</span>
+│   │   └── models/
+│   │       ├── user.py            <span class="cm"># User table model</span>
+│   │       ├── patient.py         <span class="cm"># Patient table model</span>
+│   │       └── prediction.py      <span class="cm"># Prediction table model</span>
+│   ├── routes/
+│   │   ├── auth.py                <span class="cm"># HTTP endpoints for auth</span>
+│   │   ├── patients.py            <span class="cm"># HTTP endpoints for patients</span>
+│   │   └── predictions.py         <span class="cm"># HTTP endpoints for predictions</span>
+│   ├── controllers/
+│   │   ├── auth_controller.py     <span class="cm"># Business logic for auth</span>
+│   │   ├── patient_controller.py  <span class="cm"># Business logic for patients</span>
+│   │   └── prediction_controller.py <span class="cm"># AI prediction logic</span>
+│   ├── schemas/
+│   │   └── auth_schemas.py        <span class="cm"># Pydantic data validation</span>
+│   ├── ml/
+│   │   └── train_model.py         <span class="cm"># Train all 3 models</span>
+│   └── models/                    <span class="cm"># Saved .pkl and .keras files</span>
+│
+└── heart-disease-prediction/      <span class="cm"># Next.js frontend</span>
+    ├── app/
+    │   ├── lib/api.js             <span class="cm"># API client (all fetch calls)</span>
+    │   ├── (auth)/login/page.jsx  <span class="cm"># Login + signup page</span>
+    │   └── (dashboard)/
+    │       ├── layout.jsx         <span class="cm"># Sidebar layout</span>
+    │       ├── dashboard/page.jsx <span class="cm"># Charts + stats</span>
+    │       ├── predict/page.jsx   <span class="cm"># Prediction form</span>
+    │       ├── patients/page.jsx  <span class="cm"># Patient management</span>
+    │       ├── history/page.jsx   <span class="cm"># Prediction history</span>
+    │       ├── results/[id]/page.jsx <span class="cm"># Result detail</span>
+    │       └── profile/page.jsx   <span class="cm"># Doctor profile</span>
+    ├── next.config.js
+    └── package.json</code></pre>
+</div>
+
+<!-- ======================================================= CH 6 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">6</div>
+    <div>
+      <h2>The Backend — FastAPI</h2>
+      <p>How the Python API server works</p>
+    </div>
+  </div>
+
+  <h3>6.1 What is FastAPI?</h3>
+  <p>FastAPI is a modern Python web framework for building APIs. It automatically generates documentation, validates data, and is extremely fast. It runs at <code>http://localhost:8000</code>.</p>
+
+  <div class="callout tip">
+    <span class="callout-icon">📖</span>
+    <div class="callout-body">
+      <h4>Free Interactive Docs</h4>
+      <p>When backend is running, visit <code>http://localhost:8000/docs</code> to see all endpoints with a UI to test them — no Postman needed!</p>
+    </div>
+  </div>
+
+  <h3>6.2 Routes vs Controllers Pattern</h3>
+  <p>The backend uses a clean separation of concerns:</p>
+  <table>
+    <tr><th>File</th><th>Responsibility</th><th>Example</th></tr>
+    <tr><td><strong>routes/</strong></td><td>Define HTTP endpoints, validate tokens, return HTTP responses</td><td><code>@router.post("/predict")</code></td></tr>
+    <tr><td><strong>controllers/</strong></td><td>Business logic — load models, query database, compute results</td><td><code>def run_prediction(db, data)</code></td></tr>
+  </table>
+
+<pre><code><span class="cm"># routes/predictions.py — THIN layer, just HTTP</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> APIRouter, Depends
+<span class="kw">from</span> controllers.prediction_controller <span class="kw">import</span> run_prediction
+
+router = APIRouter(prefix=<span class="str">"/api/predictions"</span>)
+
+<span class="kw">@router.post</span>(<span class="str">"/predict"</span>)
+<span class="kw">def</span> <span class="fn">predict</span>(data: PredictionInput, user=Depends(get_current_user), db=Depends(get_db)):
+    <span class="kw">return</span> run_prediction(db, data, user.id)  <span class="cm"># Delegate to controller</span>
+
+
+<span class="cm"># controllers/prediction_controller.py — BUSINESS LOGIC</span>
+<span class="kw">def</span> <span class="fn">run_prediction</span>(db, data, user_id):
+    scaler = joblib.load(<span class="str">'models/scaler.pkl'</span>)
+    model  = joblib.load(<span class="str">'models/random_forest.pkl'</span>)
+
+    features = [[data.age, data.sex, data.cp, ...]]
+    scaled   = scaler.transform(features)
+    prob     = model.predict_proba(scaled)[<span class="num">0</span>][<span class="num">1</span>]
+
+    <span class="cm"># Save to database</span>
+    prediction = Prediction(user_id=user_id, confidence=prob*<span class="num">100</span>, ...)
+    db.add(prediction); db.commit()
+
+    <span class="kw">return</span> {<span class="str">"prediction"</span>: int(prob > <span class="num">0.5</span>), <span class="str">"confidence"</span>: prob*<span class="num">100</span>}</code></pre>
+
+  <h3>6.3 JWT Authentication</h3>
+  <p>JWT (JSON Web Token) is like a temporary ID card. When a doctor logs in, the server creates a signed token. Every future request includes this token to prove identity.</p>
+
+  <div class="flow" style="justify-content:center;flex-wrap:wrap;gap:4px;">
+    <div class="flow-box blue">Login<br>(username+password)</div>
+    <span class="arrow">→</span>
+    <div class="flow-box purple">Server verifies<br>password hash</div>
+    <span class="arrow">→</span>
+    <div class="flow-box green">Creates JWT token<br>(expires in 30 days)</div>
+    <span class="arrow">→</span>
+    <div class="flow-box">Stored in<br>localStorage</div>
+    <span class="arrow">→</span>
+    <div class="flow-box red">Sent in header:<br>Authorization: Bearer &lt;token&gt;</div>
+  </div>
+
+<pre><code><span class="cm"># Creating a token</span>
+<span class="kw">from</span> jose <span class="kw">import</span> jwt
+
+<span class="kw">def</span> <span class="fn">create_access_token</span>(data: dict):
+    expire = datetime.utcnow() + timedelta(days=<span class="num">30</span>)
+    to_encode = {**data, <span class="str">"exp"</span>: expire}
+    <span class="kw">return</span> jwt.encode(to_encode, <span class="str">"SECRET_KEY"</span>, algorithm=<span class="str">"HS256"</span>)
+
+<span class="cm"># Verifying a token (runs on every protected request)</span>
+<span class="kw">def</span> <span class="fn">get_current_user</span>(token: str = Depends(oauth2_scheme)):
+    payload = jwt.decode(token, <span class="str">"SECRET_KEY"</span>, algorithms=[<span class="str">"HS256"</span>])
+    user_id = payload.get(<span class="str">"sub"</span>)
+    <span class="kw">return</span> db.query(User).filter(User.id == user_id).first()</code></pre>
+
+  <h3>6.4 Password Hashing</h3>
+  <p>Passwords are never stored as plain text. bcrypt turns <code>"mypassword"</code> into <code>"$2b$12$randomhash..."</code> — irreversible, so even if the database is leaked, passwords are safe.</p>
+
+<pre><code><span class="kw">from</span> passlib.context <span class="kw">import</span> CryptContext
+
+pwd_context = CryptContext(schemes=[<span class="str">"bcrypt"</span>])
+
+<span class="cm"># When registering</span>
+hashed = pwd_context.hash(<span class="str">"mypassword"</span>)   <span class="cm"># → "$2b$12$..."</span>
+
+<span class="cm"># When logging in</span>
+pwd_context.verify(<span class="str">"mypassword"</span>, hashed)   <span class="cm"># → True or False</span></code></pre>
+</div>
+
+<!-- ======================================================= CH 7 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">7</div>
+    <div>
+      <h2>The Frontend — Next.js</h2>
+      <p>How the React UI works and connects to the backend</p>
+    </div>
+  </div>
+
+  <h3>7.1 Next.js App Router</h3>
+  <p>Next.js 16 uses the <strong>App Router</strong> — each folder in <code>app/</code> is a route, and each <code>page.jsx</code> is a page component.</p>
+
+  <table>
+    <tr><th>URL</th><th>File</th><th>Description</th></tr>
+    <tr><td><code>/</code></td><td><code>app/page.jsx</code></td><td>Landing page (redirects to login)</td></tr>
+    <tr><td><code>/login</code></td><td><code>app/(auth)/login/page.jsx</code></td><td>Login + 2-step signup</td></tr>
+    <tr><td><code>/dashboard</code></td><td><code>app/(dashboard)/dashboard/page.jsx</code></td><td>Charts + statistics</td></tr>
+    <tr><td><code>/predict</code></td><td><code>app/(dashboard)/predict/page.jsx</code></td><td>New prediction form</td></tr>
+    <tr><td><code>/patients</code></td><td><code>app/(dashboard)/patients/page.jsx</code></td><td>Patient CRUD management</td></tr>
+    <tr><td><code>/history</code></td><td><code>app/(dashboard)/history/page.jsx</code></td><td>Prediction history + compare</td></tr>
+    <tr><td><code>/results/[id]</code></td><td><code>app/(dashboard)/results/[id]/page.jsx</code></td><td>Full prediction report</td></tr>
+    <tr><td><code>/profile</code></td><td><code>app/(dashboard)/profile/page.jsx</code></td><td>Doctor profile editor</td></tr>
+  </table>
+
+  <h3>7.2 The Route Groups (Parentheses Folders)</h3>
+  <p>Folders in parentheses like <code>(auth)</code> and <code>(dashboard)</code> are <strong>route groups</strong> — they organize files but don't add to the URL path. The <code>layout.jsx</code> inside each group wraps all pages in that group.</p>
+
+  <h3>7.3 The API Client (app/lib/api.js)</h3>
+  <p>All communication with the backend goes through one file. This keeps the HTTP logic in one place:</p>
+
+<pre><code><span class="kw">const</span> BASE = <span class="str">'http://localhost:8000'</span>;
+
+<span class="kw">function</span> <span class="fn">getToken</span>() {
+  <span class="kw">return</span> localStorage.getItem(<span class="str">'token'</span>);
+}
+
+<span class="cm">// Generic fetch helper — adds auth header automatically</span>
+<span class="kw">async function</span> <span class="fn">request</span>(url, options = {}) {
+  <span class="kw">const</span> token = <span class="fn">getToken</span>();
+  <span class="kw">const</span> res = <span class="kw">await</span> fetch(BASE + url, {
+    ...options,
+    headers: {
+      <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+      ...(token ? { <span class="str">'Authorization'</span>: <span class="str">`Bearer ${token}`</span> } : {}),
+      ...options.headers,
+    },
+  });
+  <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> Error(<span class="kw">await</span> res.text());
+  <span class="kw">return</span> res.json();
+}
+
+<span class="cm">// Usage in a React component:</span>
+<span class="kw">const</span> result = <span class="kw">await</span> predictionsApi.predict({
+  age: <span class="num">54</span>, sex: <span class="num">1</span>, cp: <span class="num">0</span>, trestbps: <span class="num">130</span>, ...
+});
+<span class="cm">// → { prediction: 1, confidence: 73.0, risk_level: "High" }</span></code></pre>
+
+  <h3>7.4 React Hooks Used</h3>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <h4>useState</h4>
+      <p>Stores component data that changes. When state changes, React re-renders the component. Example: <code>const [patients, setPatients] = useState([])</code></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h4>useEffect</h4>
+      <p>Runs code after render. Used for API calls on page load: <code>useEffect(() => { loadData(); }, [])</code></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧭</div>
+      <h4>useRouter</h4>
+      <p>Next.js hook to navigate programmatically. Used for redirect after login: <code>router.push('/dashboard')</code></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📍</div>
+      <h4>usePathname</h4>
+      <p>Gets the current URL path. Used in the sidebar to highlight the active nav item.</p>
+    </div>
+  </div>
+
+  <h3>7.5 Chart.js Integration</h3>
+<pre><code><span class="kw">import</span> { Doughnut, Line, Bar } <span class="kw">from</span> <span class="str">'react-chartjs-2'</span>;
+<span class="kw">import</span> { Chart, ArcElement, LineElement, ... } <span class="kw">from</span> <span class="str">'chart.js'</span>;
+
+Chart.register(ArcElement, LineElement, ...);  <span class="cm">// Must register used components</span>
+
+<span class="cm">// Risk distribution doughnut</span>
+<span class="kw">const</span> data = {
+  labels: [<span class="str">'High Risk'</span>, <span class="str">'Low Risk'</span>],
+  datasets: [{
+    data: [highCount, lowCount],
+    backgroundColor: [<span class="str">'#dc2626'</span>, <span class="str">'#16a34a'</span>]
+  }]
+};
+
+<span class="kw">return</span> &lt;<span class="cls">Doughnut</span> data={data} options={{ responsive: <span class="kw">true</span> }} /&gt;</code></pre>
+</div>
+
+<!-- ======================================================= CH 8 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">8</div>
+    <div>
+      <h2>The Database — MySQL</h2>
+      <p>How data is stored and retrieved</p>
+    </div>
+  </div>
+
+  <h3>8.1 The Three Tables</h3>
+
+  <h4>Users Table (doctors)</h4>
+  <table>
+    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+    <tr><td>id</td><td>INT PRIMARY KEY</td><td>Auto-incremented unique ID</td></tr>
+    <tr><td>username</td><td>VARCHAR UNIQUE</td><td>Login username</td></tr>
+    <tr><td>email</td><td>VARCHAR UNIQUE</td><td>Email address</td></tr>
+    <tr><td>hashed_password</td><td>VARCHAR</td><td>bcrypt hashed password</td></tr>
+    <tr><td>first_name, last_name</td><td>VARCHAR</td><td>Doctor's name</td></tr>
+    <tr><td>specialization</td><td>VARCHAR</td><td>e.g., "Cardiologist"</td></tr>
+    <tr><td>hospital_name</td><td>VARCHAR</td><td>Where they work</td></tr>
+    <tr><td>license_number</td><td>VARCHAR</td><td>Medical license</td></tr>
+    <tr><td>phone</td><td>VARCHAR</td><td>Contact number</td></tr>
+  </table>
+
+  <h4>Patients Table</h4>
+  <table>
+    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+    <tr><td>id</td><td>INT PRIMARY KEY</td><td>Auto-incremented</td></tr>
+    <tr><td>doctor_id</td><td>INT FOREIGN KEY</td><td>Which doctor added this patient</td></tr>
+    <tr><td>name</td><td>VARCHAR</td><td>Patient's full name</td></tr>
+    <tr><td>date_of_birth</td><td>DATE</td><td>To calculate age</td></tr>
+    <tr><td>gender</td><td>VARCHAR</td><td>Male/Female/Other</td></tr>
+    <tr><td>contact</td><td>VARCHAR</td><td>Phone number</td></tr>
+  </table>
+
+  <h4>Predictions Table</h4>
+  <table>
+    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+    <tr><td>id</td><td>INT PRIMARY KEY</td><td>Auto-incremented</td></tr>
+    <tr><td>user_id</td><td>INT FOREIGN KEY</td><td>Which doctor made this prediction</td></tr>
+    <tr><td>patient_id</td><td>INT FOREIGN KEY</td><td>Which patient (nullable)</td></tr>
+    <tr><td>model_used</td><td>VARCHAR</td><td>"ANN", "RandomForest", "LogisticRegression"</td></tr>
+    <tr><td>prediction</td><td>INT</td><td>0 = no disease, 1 = disease</td></tr>
+    <tr><td>confidence</td><td>FLOAT</td><td>0.0 – 100.0 percentage</td></tr>
+    <tr><td>risk_level</td><td>VARCHAR</td><td>"Low", "Moderate", "High"</td></tr>
+    <tr><td>input_data</td><td>JSON</td><td>All 13 clinical features stored</td></tr>
+    <tr><td>created_at</td><td>DATETIME</td><td>When prediction was made</td></tr>
+  </table>
+
+  <h3>8.2 SQLAlchemy ORM</h3>
+  <p>Instead of writing raw SQL, we use SQLAlchemy — a Python library that lets you work with database tables as Python classes:</p>
+
+<pre><code><span class="cm"># Instead of: INSERT INTO users (name, email) VALUES ('Ali', 'ali@test.com')</span>
+<span class="cm"># We write:</span>
+new_user = User(name=<span class="str">"Ali"</span>, email=<span class="str">"ali@test.com"</span>)
+db.add(new_user)
+db.commit()
+
+<span class="cm"># Instead of: SELECT * FROM patients WHERE doctor_id = 5</span>
+<span class="cm"># We write:</span>
+patients = db.query(Patient).filter(Patient.doctor_id == <span class="num">5</span>).all()</code></pre>
+
+  <h3>8.3 Database Connection</h3>
+<pre><code><span class="kw">from</span> sqlalchemy <span class="kw">import</span> create_engine
+<span class="kw">from</span> sqlalchemy.orm <span class="kw">import</span> sessionmaker
+
+DATABASE_URL = <span class="str">"mysql+pymysql://heartuser:password@localhost/heart_disease_db"</span>
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine)
+
+<span class="cm"># FastAPI dependency — gives each request its own DB session</span>
+<span class="kw">def</span> <span class="fn">get_db</span>():
+    db = SessionLocal()
+    <span class="kw">try</span>:
+        <span class="kw">yield</span> db
+    <span class="kw">finally</span>:
+        db.close()</code></pre>
+</div>
+
+<!-- ======================================================= CH 9 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">9</div>
+    <div>
+      <h2>How To Run The Project</h2>
+      <p>Step-by-step instructions to start everything</p>
+    </div>
+  </div>
+
+  <h3>9.1 Start the Backend</h3>
+<pre><code><span class="cm"># 1. Open terminal, go to backend folder</span>
+cd ~/Desktop/projects/"Heart Desiese Prediction"/backend
+
+<span class="cm"># 2. Activate virtual environment</span>
+source venv/bin/activate
+
+<span class="cm"># 3. Start FastAPI server</span>
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+<span class="cm"># ✅ Backend running at: http://localhost:8000</span>
+<span class="cm"># ✅ API docs at:        http://localhost:8000/docs</span></code></pre>
+
+  <h3>9.2 Start the Frontend</h3>
+<pre><code><span class="cm"># 1. Open a NEW terminal tab</span>
+cd ~/Desktop/projects/"Heart Desiese Prediction"/heart-disease-prediction
+
+<span class="cm"># 2. Install dependencies (only first time)</span>
+npm install
+
+<span class="cm"># 3. Start Next.js development server</span>
+npm run dev
+
+<span class="cm"># ✅ Frontend running at: http://localhost:3001</span></code></pre>
+
+  <h3>9.3 Retrain the ML Models</h3>
+<pre><code><span class="cm"># In the backend folder with venv active</span>
+cd ~/Desktop/projects/"Heart Desiese Prediction"/backend
+python ml/train_model.py
+
+<span class="cm"># This will create/overwrite:</span>
+<span class="cm">#   models/logistic_regression.pkl</span>
+<span class="cm">#   models/random_forest.pkl</span>
+<span class="cm">#   models/ann_model.keras</span>
+<span class="cm">#   models/scaler.pkl</span></code></pre>
+
+  <h3>9.4 Common Errors and Fixes</h3>
+  <table>
+    <tr><th>Error</th><th>Cause</th><th>Fix</th></tr>
+    <tr><td>Port 3000 already in use</td><td>Another app using port 3000</td><td>Next.js auto-moves to 3001 — this is fine</td></tr>
+    <tr><td>MySQL connection refused</td><td>MySQL server not started</td><td>Run <code>sudo systemctl start mysql</code></td></tr>
+    <tr><td>ModuleNotFoundError</td><td>Missing Python package</td><td>Run <code>pip install &lt;package&gt;</code> in venv</td></tr>
+    <tr><td>Hydration error in browser</td><td>Server/client HTML mismatch</td><td>Add <code>useState</code> + <code>useEffect</code> for localStorage reads</td></tr>
+    <tr><td>CORS error</td><td>Frontend blocked by backend</td><td>Check <code>allow_origins</code> in <code>main.py</code></td></tr>
+    <tr><td>JWT expired</td><td>Token older than 30 days</td><td>Log out and log back in</td></tr>
+    <tr><td>Model file not found</td><td>Models not trained yet</td><td>Run <code>python ml/train_model.py</code></td></tr>
+  </table>
+</div>
+
+<!-- ======================================================= CH 10 -->
+<div class="chapter">
+  <div class="chapter-header">
+    <div class="chapter-num">10</div>
+    <div>
+      <h2>Key Concepts Glossary</h2>
+      <p>Quick reference for all technical terms</p>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr><td><strong>ANN</strong></td><td>Artificial Neural Network — ML model inspired by brain neurons, layered computation</td></tr>
+    <tr><td><strong>API</strong></td><td>Application Programming Interface — a way for two programs to talk (frontend ↔ backend)</td></tr>
+    <tr><td><strong>Backpropagation</strong></td><td>Algorithm to train neural networks by adjusting weights based on prediction error</td></tr>
+    <tr><td><strong>bcrypt</strong></td><td>Password hashing algorithm — converts password to unreadable hash for safe storage</td></tr>
+    <tr><td><strong>Binary Classification</strong></td><td>Predicting one of two categories (Yes/No, 0/1)</td></tr>
+    <tr><td><strong>Dropout</strong></td><td>ANN regularization technique — randomly disables neurons during training to prevent overfitting</td></tr>
+    <tr><td><strong>Epoch</strong></td><td>One full pass through the entire training dataset during neural network training</td></tr>
+    <tr><td><strong>FastAPI</strong></td><td>Python web framework for building REST APIs with automatic validation and docs</td></tr>
+    <tr><td><strong>Feature</strong></td><td>An input variable (e.g., age, cholesterol) used for making predictions</td></tr>
+    <tr><td><strong>FOREIGN KEY</strong></td><td>A database column that references the primary key of another table — creates relationships</td></tr>
+    <tr><td><strong>HTTP Methods</strong></td><td>GET (read), POST (create), PUT (update), DELETE (remove)</td></tr>
+    <tr><td><strong>joblib</strong></td><td>Python library for saving/loading sklearn models to/from .pkl files</td></tr>
+    <tr><td><strong>JSX</strong></td><td>JavaScript syntax extension that lets you write HTML inside JavaScript/React</td></tr>
+    <tr><td><strong>JWT</strong></td><td>JSON Web Token — a signed token for authentication, stored in localStorage</td></tr>
+    <tr><td><strong>Logistic Regression</strong></td><td>Linear classification algorithm using sigmoid function to output probabilities</td></tr>
+    <tr><td><strong>MySQL</strong></td><td>Relational database system — stores data in tables with rows and columns</td></tr>
+    <tr><td><strong>Next.js</strong></td><td>React framework with file-based routing, SSR, and built-in optimization</td></tr>
+    <tr><td><strong>ORM</strong></td><td>Object-Relational Mapper — lets you use database tables as Python classes (SQLAlchemy)</td></tr>
+    <tr><td><strong>Overfitting</strong></td><td>When a model memorizes training data but fails on new data — poor generalization</td></tr>
+    <tr><td><strong>PRIMARY KEY</strong></td><td>A unique identifier for each row in a database table</td></tr>
+    <tr><td><strong>Random Forest</strong></td><td>Ensemble of decision trees that vote on the final prediction</td></tr>
+    <tr><td><strong>React</strong></td><td>JavaScript library for building interactive UIs with reusable components</td></tr>
+    <tr><td><strong>ReLU</strong></td><td>Activation function: max(0, x) — introduces non-linearity in neural networks</td></tr>
+    <tr><td><strong>ROC-AUC</strong></td><td>Model evaluation metric — area under the ROC curve (0.5=random, 1.0=perfect)</td></tr>
+    <tr><td><strong>Scikit-learn (sklearn)</strong></td><td>Python ML library with simple APIs for Logistic Regression, Random Forest, preprocessing</td></tr>
+    <tr><td><strong>Sigmoid</strong></td><td>Activation function that outputs 0–1, used for binary classification output</td></tr>
+    <tr><td><strong>SQLAlchemy</strong></td><td>Python ORM that maps Python classes to database tables</td></tr>
+    <tr><td><strong>SSR</strong></td><td>Server-Side Rendering — page HTML is generated on the server before sending to browser</td></tr>
+    <tr><td><strong>StandardScaler</strong></td><td>Normalizes features to mean=0, standard deviation=1</td></tr>
+    <tr><td><strong>TensorFlow</strong></td><td>Google's deep learning framework — used to build and train the ANN</td></tr>
+    <tr><td><strong>Turbopack</strong></td><td>Next.js's new fast bundler (replaces Webpack) — enabled by default in Next.js 16</td></tr>
+    <tr><td><strong>UCI Dataset</strong></td><td>University of California Irvine — provides public ML datasets including heart disease data</td></tr>
+    <tr><td><strong>useEffect</strong></td><td>React hook that runs code after a component renders — used for API calls</td></tr>
+    <tr><td><strong>useState</strong></td><td>React hook that stores data which can change over time, triggering re-renders</td></tr>
+    <tr><td><strong>uvicorn</strong></td><td>Python ASGI server that runs FastAPI applications</td></tr>
+    <tr><td><strong>Virtual Environment (venv)</strong></td><td>Isolated Python environment so project packages don't conflict with system packages</td></tr>
+    <tr><td><strong>Weights</strong></td><td>Numbers that a neural network learns during training — determine how much each input matters</td></tr>
+  </table>
+
+  <hr class="divider"/>
+  <div style="text-align:center;padding:30px 0;color:var(--gray-500);">
+    <div style="font-size:32px;margin-bottom:10px;">❤️</div>
+    <p style="font-weight:700;color:var(--gray-900);font-size:16px;">CardioPredict AI — CS619 Final Year Project</p>
+    <p style="font-size:13px;">This manual was generated for the project. Study it well!</p>
+    <p style="font-size:12px;margin-top:8px;">Stack: Next.js 16 + FastAPI + TensorFlow 2.21 + MySQL · 2026</p>
+  </div>
+</div>
+
+</body>
+</html>
