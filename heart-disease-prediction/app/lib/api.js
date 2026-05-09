@@ -24,6 +24,12 @@ export const authApi = {
     const data = await res.json(); setToken(data.access_token); saveUser(data.user); return data;
   },
   async register(payload) { return apiFetch("/auth/register", { method: "POST", body: JSON.stringify(payload) }); },
+  async checkAvailability({ username, email } = {}) {
+    const params = new URLSearchParams();
+    if (username) params.append("username", username);
+    if (email) params.append("email", email);
+    return apiFetch(`/auth/check-availability?${params}`);
+  },
   logout() { removeToken(); },
 };
 

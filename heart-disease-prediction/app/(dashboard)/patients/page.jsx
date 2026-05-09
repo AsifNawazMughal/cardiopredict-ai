@@ -64,7 +64,7 @@ export default function PatientsPage() {
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
         <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by name..."
-          className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"/>
+          className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg bg-white text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"/>
       </div>
 
       {/* Table */}
@@ -120,7 +120,7 @@ export default function PatientsPage() {
                 <Field label="Date of Birth" type="date" value={form.date_of_birth} onChange={v=>set("date_of_birth",v)}/>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Gender</label>
-                  <select value={form.gender} onChange={e=>set("gender",e.target.value)} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                  <select value={form.gender} onChange={e=>set("gender",e.target.value)} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500">
                     {GENDERS.map(g=><option key={g}>{g}</option>)}
                   </select>
                 </div>
@@ -129,7 +129,7 @@ export default function PatientsPage() {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Address</label>
                 <textarea value={form.address} onChange={e=>set("address",e.target.value)} rows={2} placeholder="Street, City, Country"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"/>
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"/>
               </div>
             </div>
             <div className="flex justify-end gap-3 p-5 border-t">
@@ -167,7 +167,7 @@ function Field({label,type="text",value,onChange,placeholder,required}){
     <div>
       <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
       <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} required={required}
-        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"/>
+        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"/>
     </div>
   );
 }

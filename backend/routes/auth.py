@@ -1,4 +1,5 @@
 """Auth Routes — thin HTTP layer, delegates to auth_controller"""
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -8,7 +9,7 @@ from database.db import get_db
 from database.models.user import User
 from schemas.auth_schemas import UserCreate, UserResponse, UserProfileUpdate, Token
 from controllers.auth_controller import (
-    register_user, authenticate_user, update_user_profile,
+    register_user, authenticate_user, update_user_profile, check_availability,
     create_access_token, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 )
 
@@ -35,6 +36,15 @@ async def get_current_user(
     if not user:
         raise err
     return user
+
+
+@router.get("/check-availability")
+def check_availability_route(
+    username: Optional[str] = None,
+    email: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    return check_availability(db, username, email)
 
 
 @router.post("/register", response_model=UserResponse, status_code=201)

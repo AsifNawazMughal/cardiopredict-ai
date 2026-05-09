@@ -76,6 +76,16 @@ def register_user(db: Session, user_data: UserCreate) -> User:
     return user
 
 
+def check_availability(db: Session, username: Optional[str] = None, email: Optional[str] = None) -> dict:
+    """Live check used by the registration form to tell whether a username/email is already taken."""
+    result = {}
+    if username:
+        result["username_taken"] = db.query(User).filter(User.username == username).first() is not None
+    if email:
+        result["email_taken"] = db.query(User).filter(User.email == email).first() is not None
+    return result
+
+
 def authenticate_user(db: Session, username: str, password: str) -> User:
     """Verify credentials. Raises 401 if invalid."""
     user = db.query(User).filter(User.username == username).first()

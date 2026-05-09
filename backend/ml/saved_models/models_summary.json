@@ -1,11 +1,11 @@
 {
   "ANN": {
-    "accuracy": 0.6721,
-    "precision": 0.6856,
-    "recall": 0.6721,
-    "f1_score": 0.6768,
-    "roc_auc": 0.859,
-    "path": "ml/saved_models/ann_model.keras"
+    "accuracy": 0.7213,
+    "precision": 0.6851,
+    "recall": 0.7213,
+    "f1_score": 0.6897,
+    "roc_auc": 0.8337,
+    "path": "/home/asifnawaz/Desktop/cardiopredict-ai/backend/ml/saved_models/ann_model.keras"
   },
   "LogisticRegression": {
     "accuracy": 0.7377,
@@ -13,7 +13,7 @@
     "recall": 0.7377,
     "f1_score": 0.7287,
     "roc_auc": 0.8481,
-    "path": "/home/asifnawaz/Desktop/projects/Heart Desiese Prediction /backend/ml/saved_models/logistic_regression.pkl"
+    "path": "/home/asifnawaz/Desktop/cardiopredict-ai/backend/ml/saved_models/logistic_regression.pkl"
   },
   "RandomForest": {
     "accuracy": 0.6885,
@@ -21,6 +21,6 @@
     "recall": 0.6885,
     "f1_score": 0.6603,
     "roc_auc": 0.8442,
-    "path": "/home/asifnawaz/Desktop/projects/Heart Desiese Prediction /backend/ml/saved_models/random_forest.pkl"
+    "path": "/home/asifnawaz/Desktop/cardiopredict-ai/backend/ml/saved_models/random_forest.pkl"
   }
 }

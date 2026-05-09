@@ -69,7 +69,7 @@ export default function HistoryPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search patient..."
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"/>
+            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg bg-white text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"/>
         </div>
         <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2">
           <Filter className="w-4 h-4 text-gray-400"/>

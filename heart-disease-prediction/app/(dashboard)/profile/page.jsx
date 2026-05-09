@@ -74,7 +74,7 @@ export default function ProfilePage() {
             <label className="block text-xs font-medium text-gray-700 mb-1">Specialization</label>
             <div className="relative">
               <Stethoscope className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
-              <select value={form.specialization} onChange={e=>set("specialization",e.target.value)} className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-white">
+              <select value={form.specialization} onChange={e=>set("specialization",e.target.value)} className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white">
                 {SPECIALIZATIONS.map(s=><option key={s}>{s}</option>)}
               </select>
             </div>
@@ -102,7 +102,7 @@ function Field({icon,label,value,onChange,placeholder}){
       <div className="relative">
         {icon&&<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</span>}
         <input type="text" value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
-          className={`w-full ${icon?"pl-9":"pl-3"} pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500`}/>
+          className={`w-full ${icon?"pl-9":"pl-3"} pr-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500`}/>
       </div>
     </div>
   );

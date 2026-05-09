@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { patientsApi, predictionsApi } from "../../lib/api";
-import { Activity, Search, User, AlertCircle, CheckCircle2, ChevronDown } from "lucide-react";
+import { Activity, Search, User, AlertCircle, CheckCircle2, ChevronDown, UserPlus } from "lucide-react";
 
 const MODELS = ["ANN","LogisticRegression","RandomForest"] ;
 
@@ -20,11 +21,14 @@ export default function PredictPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [model, setModel] = useState("ANN");
+  const [newPatient, setNewPatient] = useState({ first_name: "", last_name: "", date_of_birth: "" });
   const [form, setForm] = useState({
     age: "", sex: "1", chest_pain_type: "0", resting_bp: "", cholesterol: "",
     fasting_blood_sugar: "0", resting_ecg: "0", max_heart_rate: "", exercise_angina: "0",
     st_depression: "0", st_slope: "0", vessels_count: "0", thalassemia: "2",
   });
+
+  const setNew = (k, v) => setNewPatient(p => ({...p, [k]: v}));
 
   useEffect(() => { patientsApi.getAll().then(setPatients).catch(()=>{}); }, []);
 
@@ -37,6 +41,17 @@ export default function PredictPage() {
     }
   }, [selectedPatient]);
 
+  // Auto-fill age from DOB for a new patient too
+  useEffect(() => {
+    if (!selectedPatient && newPatient.date_of_birth) {
+      const dob = new Date(newPatient.date_of_birth);
+      if (!isNaN(dob)) {
+        const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+        if (age > 0 && age < 130) setForm(f => ({...f, age: String(age)}));
+      }
+    }
+  }, [newPatient.date_of_birth, selectedPatient]);
+
   const filteredPatients = patients.filter(p =>
     `${p.first_name} ${p.last_name}`.toLowerCase().includes(search.toLowerCase())
   );
@@ -48,8 +63,26 @@ export default function PredictPage() {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
+      let patientId = selectedPatient?.id;
+      // Create the patient on the fly if no existing one was selected
+      if (!patientId && (newPatient.first_name.trim() || newPatient.last_name.trim())) {
+        if (!newPatient.first_name.trim() || !newPatient.last_name.trim()) {
+          toast.error("Please enter both first and last name for the new patient");
+          setLoading(false); return;
+        }
+        const created = await patientsApi.create({
+          first_name: newPatient.first_name.trim(),
+          last_name: newPatient.last_name.trim(),
+          date_of_birth: newPatient.date_of_birth || null,
+          gender: form.sex === "0" ? "Female" : "Male",
+        });
+        patientId = created.id;
+        setPatients(p => [created, ...p]);
+        toast.success(`Patient "${created.first_name} ${created.last_name}" added`);
+      }
+
       const data = {
-        patient_id: selectedPatient?.id,
+        patient_id: patientId,
         age: num(form.age), sex: num(form.sex),
         chest_pain_type: num(form.chest_pain_type), resting_bp: num(form.resting_bp),
         cholesterol: num(form.cholesterol), fasting_blood_sugar: num(form.fasting_blood_sugar),
@@ -60,7 +93,10 @@ export default function PredictPage() {
       };
       const result = await predictionsApi.predict(data);
       router.push(`/results/${result.prediction_id}`);
-    } catch(err){ setError(err instanceof Error?err.message:"Prediction failed"); }
+    } catch(err){
+      const msg = err instanceof Error ? err.message : "Prediction failed";
+      setError(msg); toast.error(msg);
+    }
     finally{ setLoading(false); }
   }
 
@@ -89,7 +125,7 @@ export default function PredictPage() {
                 onChange={e=>{ setSearch(e.target.value); setSelectedPatient(null); setShowDropdown(true); }}
                 onFocus={()=>setShowDropdown(true)}
                 placeholder="Type name to search patients..." readOnly={!!selectedPatient}
-                className="w-full pl-9 pr-9 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"/>
+                className="w-full pl-9 pr-9 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"/>
               {selectedPatient && <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500"/>}
             </div>
             {showDropdown && !selectedPatient && filteredPatients.length>0 && (
@@ -115,11 +151,25 @@ export default function PredictPage() {
             </div>
           )}
 
+          {!selectedPatient && (
+            <div className="mb-4">
+              <p className="text-xs font-medium text-gray-600 mb-2 flex items-center gap-1.5">
+                <UserPlus className="w-3.5 h-3.5 text-red-500"/>
+                New Patient Details <span className="text-gray-400 font-normal">(filled-in details will be saved as a new patient record)</span>
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                <Inp label="First Name" type="text" value={newPatient.first_name} onChange={v=>setNew("first_name",v)} placeholder="John" required/>
+                <Inp label="Last Name" type="text" value={newPatient.last_name} onChange={v=>setNew("last_name",v)} placeholder="Doe" required/>
+                <Inp label="Date of Birth" type="date" value={newPatient.date_of_birth} onChange={v=>setNew("date_of_birth",v)} hint="(optional)"/>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-3 gap-3">
             <Inp label="Age (years)" type="number" value={form.age} onChange={v=>set("age",v)} min="1" max="120" placeholder="e.g. 55" required/>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Gender</label>
-              <select value={form.sex} onChange={e=>set("sex",e.target.value)} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+              <label className="block text-xs font-medium text-gray-700 mb-1">Gender<span className="text-red-600 ml-0.5">*</span></label>
+              <select value={form.sex} onChange={e=>set("sex",e.target.value)} required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500">
                 <option value="1">Male</option><option value="0">Female</option>
               </select>
             </div>
@@ -200,7 +250,7 @@ export default function PredictPage() {
         </div>
 
         <div className="flex gap-3 justify-end">
-          <button type="button" onClick={()=>{ setForm({age:"",sex:"1",chest_pain_type:"0",resting_bp:"",cholesterol:"",fasting_blood_sugar:"0",resting_ecg:"0",max_heart_rate:"",exercise_angina:"0",st_depression:"0",st_slope:"0",vessels_count:"0",thalassemia:"2"}); setSelectedPatient(null); setSearch(""); }}
+          <button type="button" onClick={()=>{ setForm({age:"",sex:"1",chest_pain_type:"0",resting_bp:"",cholesterol:"",fasting_blood_sugar:"0",resting_ecg:"0",max_heart_rate:"",exercise_angina:"0",st_depression:"0",st_slope:"0",vessels_count:"0",thalassemia:"2"}); setSelectedPatient(null); setSearch(""); setNewPatient({first_name:"",last_name:"",date_of_birth:""}); }}
             className="px-5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Clear Form</button>
           <button type="submit" disabled={loading}
             className="px-8 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white font-semibold rounded-lg text-sm flex items-center gap-2 transition-colors">
@@ -215,9 +265,12 @@ export default function PredictPage() {
 function Inp({label,type,value,onChange,min,max,step,placeholder,required,hint}){
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-700 mb-1">{label}{hint&&<span className="text-gray-400 ml-1 font-normal">{hint}</span>}</label>
+      <label className="block text-xs font-medium text-gray-700 mb-1">
+        {label}{required && <span className="text-red-600 ml-0.5">*</span>}
+        {hint && <span className="text-gray-400 ml-1 font-normal">{hint}</span>}
+      </label>
       <input type={type} value={value} onChange={e=>onChange(e.target.value)} min={min} max={max} step={step} placeholder={placeholder} required={required}
-        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"/>
+        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"/>
     </div>
   );
 }
@@ -227,7 +280,7 @@ function SelectInp({label,value,onChange,options}){
     <div>
       <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
       <div className="relative">
-        <select value={value} onChange={e=>onChange(e.target.value)} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 appearance-none bg-white pr-8">
+        <select value={value} onChange={e=>onChange(e.target.value)} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 appearance-none bg-white pr-8">
           {options.map((o,i)=><option key={i} value={i}>{o}</option>)}
         </select>
         <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"/>
