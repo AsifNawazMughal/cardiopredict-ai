@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
 import { predictionsApi } from "../../lib/api";
 import { Clock, Search, Eye, GitCompare, Download, Filter } from "lucide-react";
 
@@ -37,11 +38,36 @@ export default function HistoryPage() {
     else if(selected.length===1) router.push(`/results/${selected[0]}`);
   }
 
-  function exportCSV(){
-    const rows = [["ID","Patient","Risk","Confidence","Low%","Medium%","High%","Model","Date"]];
-    filtered.forEach(h=>rows.push([String(h.id),h.patient_name,h.risk_class,String(h.confidence),String(h.probability_low),String(h.probability_medium),String(h.probability_high),h.model_used,new Date(h.predicted_at).toLocaleDateString()]));
-    const csv = rows.map(r=>r.join(",")).join("\n");
-    const a = document.createElement("a"); a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv); a.download="predictions.csv"; a.click();
+  function exportExcel(){
+    // patient_name first, then heart.csv feature columns, then prediction outputs
+    const header = [
+      "patient_name",
+      "age","sex","cp","trestbps","chol","fbs","restecg","thalach","exang","oldpeak","slope","ca","thal",
+      "risk_class","confidence","probability_low","probability_medium","probability_high",
+      "model_used","predicted_at",
+    ];
+    const rows = filtered.map(h => [
+      h.patient_name,
+      h.age, h.sex, h.cp, h.trestbps, h.chol, h.fbs, h.restecg, h.thalach,
+      h.exang, h.oldpeak, h.slope, h.ca, h.thal,
+      h.risk_class, h.confidence, h.probability_low, h.probability_medium, h.probability_high,
+      h.model_used, h.predicted_at,
+    ]);
+
+    const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+
+    // Auto-size columns: pick the widest cell value (header or row) per column, capped to 50
+    ws["!cols"] = header.map((h, i) => {
+      const maxLen = Math.max(
+        String(h).length,
+        ...rows.map(r => (r[i] === null || r[i] === undefined) ? 0 : String(r[i]).length),
+      );
+      return { wch: Math.min(Math.max(maxLen + 2, 8), 50) };
+    });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Predictions");
+    XLSX.writeFile(wb, "predictions.xlsx");
   }
 
   return (
@@ -58,8 +84,8 @@ export default function HistoryPage() {
               {selected.length===2?"Compare 2 Results":"View Result"}
             </button>
           )}
-          <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
-            <Download className="w-4 h-4"/> Export CSV
+          <button onClick={exportExcel} className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+            <Download className="w-4 h-4"/> Export Excel
           </button>
         </div>
       </div>

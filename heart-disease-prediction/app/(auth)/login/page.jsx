@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { authApi } from "../../lib/api";
-import { Heart, Lock, User, Mail, Phone, Building2, Stethoscope, BadgeCheck, ChevronRight, ChevronLeft, Check, X, Loader2, Eye, EyeOff } from "lucide-react";
+import Field from "@/components/Field";
+import { Heart, Lock, User, Mail, Phone, Building2, Stethoscope, BadgeCheck, ChevronRight, ChevronLeft, Check, X } from "lucide-react";
 
 const SPECIALIZATIONS = ["Cardiology","General Medicine","Internal Medicine","Emergency Medicine","Family Medicine","Other"];
 
@@ -142,25 +143,25 @@ export default function LoginPage() {
           )}
           <form onSubmit={handleSubmit} className="space-y-3">
             {mode==="login" && <>
-              <Field icon={<User className="w-4 h-4"/>} label="Username" type="text" value={form.username} onChange={v=>set("username",v)} placeholder="Enter username"/>
-              <Field icon={<Lock className="w-4 h-4"/>} label="Password" type="password" value={form.password} onChange={v=>set("password",v)} placeholder="Enter password"/>
+              <Field icon={<User className="w-4 h-4"/>} label="Username" type="text" value={form.username} onChange={v=>set("username",v)} placeholder="Enter username" required/>
+              <Field icon={<Lock className="w-4 h-4"/>} label="Password" type="password" value={form.password} onChange={v=>set("password",v)} placeholder="Enter password" required/>
             </>}
             {mode==="register" && step===1 && <>
               <div className="grid grid-cols-2 gap-3">
-                <Field icon={<User className="w-4 h-4"/>} label="First Name" type="text" value={form.first_name} onChange={v=>set("first_name",v)} placeholder="John"/>
-                <Field label="Last Name" type="text" value={form.last_name} onChange={v=>set("last_name",v)} placeholder="Doe"/>
+                <Field icon={<User className="w-4 h-4"/>} label="First Name" type="text" value={form.first_name} onChange={v=>set("first_name",v)} placeholder="John" required/>
+                <Field label="Last Name" type="text" value={form.last_name} onChange={v=>set("last_name",v)} placeholder="Doe" required/>
               </div>
-              <Field icon={<User className="w-4 h-4"/>} label="Username" type="text" value={form.username} onChange={v=>set("username",v)} placeholder="Choose username"
+              <Field icon={<User className="w-4 h-4"/>} label="Username" type="text" value={form.username} onChange={v=>set("username",v)} placeholder="Choose username" required
                 status={availability.username}
                 statusMessage={
                   usernameFormatError ? usernameFormatError :
                   availability.username==="taken" ? "Username already taken" :
                   availability.username==="available" ? "Username is available" : null
                 }/>
-              <Field icon={<Mail className="w-4 h-4"/>} label="Email" type="email" value={form.email} onChange={v=>set("email",v)} placeholder="doctor@hospital.com"
+              <Field icon={<Mail className="w-4 h-4"/>} label="Email" type="email" value={form.email} onChange={v=>set("email",v)} placeholder="doctor@hospital.com" required
                 status={availability.email} statusMessage={availability.email==="taken" ? "Email already registered" : availability.email==="available" ? "Email is available" : null}/>
               <div>
-                <Field icon={<Lock className="w-4 h-4"/>} label="Password" type="password" value={form.password} onChange={v=>set("password",v)} placeholder="Min 8 characters"/>
+                <Field icon={<Lock className="w-4 h-4"/>} label="Password" type="password" value={form.password} onChange={v=>set("password",v)} placeholder="Min 8 characters" required/>
                 {form.password.length > 0 && !passwordValid && (
                   <ul className="mt-1.5 space-y-0.5">
                     {passwordRules.map(r => (
@@ -172,7 +173,7 @@ export default function LoginPage() {
                   </ul>
                 )}
               </div>
-              <Field icon={<Lock className="w-4 h-4"/>} label="Confirm Password" type="password" value={form.confirm_password} onChange={v=>set("confirm_password",v)} placeholder="Re-enter password"
+              <Field icon={<Lock className="w-4 h-4"/>} label="Confirm Password" type="password" value={form.confirm_password} onChange={v=>set("confirm_password",v)} placeholder="Re-enter password" required
                 status={passwordsMismatch ? "taken" : passwordsMatch ? "available" : null}
                 statusMessage={passwordsMismatch ? "Passwords do not match" : passwordsMatch ? "Passwords match" : null}/>
             </>}
@@ -186,9 +187,9 @@ export default function LoginPage() {
                   </select>
                 </div>
               </div>
-              <Field icon={<Building2 className="w-4 h-4"/>} label="Hospital / Clinic Name" type="text" value={form.hospital_name} onChange={v=>set("hospital_name",v)} placeholder="City General Hospital"/>
+              <Field icon={<Building2 className="w-4 h-4"/>} label="Hospital / Clinic Name" type="text" value={form.hospital_name} onChange={v=>set("hospital_name",v)} placeholder="City General Hospital" required/>
               <PhoneField value={form.phone} onChange={v=>set("phone",v)}/>
-              <Field icon={<BadgeCheck className="w-4 h-4"/>} label="Medical License Number" type="text" value={form.license_number} onChange={v=>set("license_number",v)} placeholder="PMDC-12345"/>
+              <Field icon={<BadgeCheck className="w-4 h-4"/>} label="Medical License Number" type="text" value={form.license_number} onChange={v=>set("license_number",v)} placeholder="PMDC-12345" required/>
             </>}
             <div className="flex gap-2 pt-1">
               {mode==="register" && step===2 && (
@@ -255,36 +256,3 @@ function PhoneField({ value, onChange }) {
   );
 }
 
-function Field({ icon, label, type, value, onChange, placeholder, status, statusMessage }) {
-  const [show, setShow] = useState(false);
-  const isPassword = type === "password";
-  const inputType = isPassword && show ? "text" : type;
-  const borderColor =
-    status === "taken" ? "border-red-400 focus:ring-red-500" :
-    status === "available" ? "border-green-400 focus:ring-green-500" :
-    "border-gray-300 focus:ring-red-500";
-  const messageColor = status === "taken" ? "text-red-600" : status === "available" ? "text-green-600" : "text-gray-500";
-  const rightPad = isPassword && status ? "pr-16" : (isPassword || status) ? "pr-9" : "pr-3";
-  const statusRight = isPassword ? "right-9" : "right-3";
-  return (
-    <div>
-      <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
-      <div className="relative">
-        {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</span>}
-        <input type={inputType} value={value} onChange={e=>onChange(e.target.value)} required placeholder={placeholder}
-          className={`w-full ${icon?"pl-9":"pl-3"} ${rightPad} py-2.5 border ${borderColor} rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2`}/>
-        {status === "checking" && <Loader2 className={`absolute ${statusRight} top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin`}/>}
-        {status === "available" && <Check className={`absolute ${statusRight} top-1/2 -translate-y-1/2 w-4 h-4 text-green-500`}/>}
-        {status === "taken" && <X className={`absolute ${statusRight} top-1/2 -translate-y-1/2 w-4 h-4 text-red-500`}/>}
-        {isPassword && (
-          <button type="button" onClick={()=>setShow(s=>!s)} tabIndex={-1}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            aria-label={show ? "Hide password" : "Show password"}>
-            {show ? <EyeOff className="w-4 h-4"/> : <Eye className="w-4 h-4"/>}
-          </button>
-        )}
-      </div>
-      {statusMessage && <p className={`text-xs mt-1 ${messageColor}`}>{statusMessage}</p>}
-    </div>
-  );
-}

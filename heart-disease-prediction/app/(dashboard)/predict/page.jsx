@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { patientsApi, predictionsApi } from "../../lib/api";
+import Field from "@/components/Field";
 import { Activity, Search, User, AlertCircle, CheckCircle2, ChevronDown, UserPlus } from "lucide-react";
 
 const MODELS = ["ANN","LogisticRegression","RandomForest"] ;
@@ -11,6 +12,28 @@ const CHEST_PAIN = ["Typical Angina","Atypical Angina","Non-Anginal Pain","Asymp
 const ECG = ["Normal","ST-T Wave Abnormality","Left Ventricular Hypertrophy"];
 const ST_SLOPE = ["Upsloping","Flat","Downsloping"];
 const THAL = ["Normal","Fixed Defect","Reversible Defect","Unknown"];
+
+// Sample profiles drawn from the Cleveland dataset — useful for demos / quick testing
+const TEMPLATES = {
+  low: {
+    label: "Low Risk Sample",
+    age: "34", sex: "1", chest_pain_type: "0", resting_bp: "118", cholesterol: "182",
+    fasting_blood_sugar: "0", resting_ecg: "0", max_heart_rate: "174", exercise_angina: "0",
+    st_depression: "0", st_slope: "0", vessels_count: "0", thalassemia: "0",
+  },
+  medium: {
+    label: "Medium Risk Sample",
+    age: "54", sex: "1", chest_pain_type: "2", resting_bp: "140", cholesterol: "239",
+    fasting_blood_sugar: "0", resting_ecg: "1", max_heart_rate: "151", exercise_angina: "0",
+    st_depression: "1.6", st_slope: "1", vessels_count: "1", thalassemia: "2",
+  },
+  high: {
+    label: "High Risk Sample",
+    age: "67", sex: "1", chest_pain_type: "3", resting_bp: "160", cholesterol: "286",
+    fasting_blood_sugar: "1", resting_ecg: "2", max_heart_rate: "108", exercise_angina: "1",
+    st_depression: "3.0", st_slope: "2", vessels_count: "3", thalassemia: "2",
+  },
+};
 
 export default function PredictPage() {
   const router = useRouter();
@@ -58,6 +81,17 @@ export default function PredictPage() {
 
   const set = (k, v) => setForm(p => ({...p, [k]: v}));
   const num = (v) => Number(v);
+
+  function loadTemplate(name) {
+    const t = TEMPLATES[name];
+    if (!t) return;
+    const { label, ...values } = t;
+    setForm(values);
+    setSelectedPatient(null);
+    setSearch("");
+    setNewPatient({ first_name: "", last_name: "", date_of_birth: "" });
+    toast.success(`Loaded ${label}`);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -132,9 +166,9 @@ export default function PredictPage() {
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-auto">
                 {filteredPatients.map(p=>(
                   <button key={p.id} type="button" onClick={()=>{ setSelectedPatient(p); setShowDropdown(false); }}
-                    className="w-full text-left px-4 py-2.5 hover:bg-red-50 text-sm flex items-center justify-between">
+                    className="w-full text-left px-4 py-2.5 hover:bg-red-50 text-sm flex items-center justify-between text-gray-900">
                     <span className="font-medium">{p.first_name} {p.last_name}</span>
-                    <span className="text-gray-400 text-xs">{p.gender} • {p.date_of_birth}</span>
+                    <span className="text-gray-900 text-xs">{p.gender} • {p.date_of_birth}</span>
                   </button>
                 ))}
               </div>
@@ -158,22 +192,22 @@ export default function PredictPage() {
                 New Patient Details <span className="text-gray-400 font-normal">(filled-in details will be saved as a new patient record)</span>
               </p>
               <div className="grid grid-cols-3 gap-3">
-                <Inp label="First Name" type="text" value={newPatient.first_name} onChange={v=>setNew("first_name",v)} placeholder="John" required/>
-                <Inp label="Last Name" type="text" value={newPatient.last_name} onChange={v=>setNew("last_name",v)} placeholder="Doe" required/>
-                <Inp label="Date of Birth" type="date" value={newPatient.date_of_birth} onChange={v=>setNew("date_of_birth",v)} hint="(optional)"/>
+                <Field label="First Name" type="text" value={newPatient.first_name} onChange={v=>setNew("first_name",v)} placeholder="John" required/>
+                <Field label="Last Name" type="text" value={newPatient.last_name} onChange={v=>setNew("last_name",v)} placeholder="Doe" required/>
+                <Field label="Date of Birth" type="date" value={newPatient.date_of_birth} onChange={v=>setNew("date_of_birth",v)} hint="(optional)"/>
               </div>
             </div>
           )}
 
           <div className="grid grid-cols-3 gap-3">
-            <Inp label="Age (years)" type="number" value={form.age} onChange={v=>set("age",v)} min="1" max="120" placeholder="e.g. 55" required/>
+            <Field label="Age (years)" type="number" value={form.age} onChange={v=>set("age",v)} min="1" max="120" placeholder="e.g. 55" required/>
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Gender<span className="text-red-600 ml-0.5">*</span></label>
               <select value={form.sex} onChange={e=>set("sex",e.target.value)} required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500">
                 <option value="1">Male</option><option value="0">Female</option>
               </select>
             </div>
-            <Inp label="Resting BP (mmHg)" type="number" value={form.resting_bp} onChange={v=>set("resting_bp",v)} min="50" max="250" placeholder="e.g. 120" required/>
+            <Field label="Resting BP (mmHg)" type="number" value={form.resting_bp} onChange={v=>set("resting_bp",v)} min="50" max="250" placeholder="e.g. 120" required/>
           </div>
         </div>
 
@@ -184,11 +218,11 @@ export default function PredictPage() {
             <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Deep Learning Inputs</span>
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <Inp label="Cholesterol (mg/dl)" type="number" value={form.cholesterol} onChange={v=>set("cholesterol",v)} min="0" max="600" placeholder="e.g. 200" required
+            <Field label="Cholesterol (mg/dl)" type="number" value={form.cholesterol} onChange={v=>set("cholesterol",v)} min="0" max="600" placeholder="e.g. 200" required
               hint="Normal: &lt;200 mg/dl"/>
-            <Inp label="Max Heart Rate (bpm)" type="number" value={form.max_heart_rate} onChange={v=>set("max_heart_rate",v)} min="60" max="220" placeholder="e.g. 150" required
+            <Field label="Max Heart Rate (bpm)" type="number" value={form.max_heart_rate} onChange={v=>set("max_heart_rate",v)} min="60" max="220" placeholder="e.g. 150" required
               hint="Normal: 60–100 bpm"/>
-            <Inp label="ST Depression" type="number" value={form.st_depression} onChange={v=>set("st_depression",v)} step="0.1" min="0" max="10" placeholder="e.g. 1.0"
+            <Field label="ST Depression" type="number" value={form.st_depression} onChange={v=>set("st_depression",v)} step="0.1" min="0" max="10" placeholder="e.g. 1.0"
               hint="Range: 0.0–6.2"/>
 
             <SelectInp label="Chest Pain Type" value={form.chest_pain_type} onChange={v=>set("chest_pain_type",v)} options={CHEST_PAIN}/>
@@ -199,7 +233,7 @@ export default function PredictPage() {
               <label className="block text-xs font-medium text-gray-700 mb-1">Fasting Blood Sugar &gt;120 mg/dl</label>
               <div className="flex gap-3 mt-2">
                 {["No","Yes"].map((l,i)=>(
-                  <label key={l} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                  <label key={l} className="flex items-center gap-1.5 text-sm text-gray-900 cursor-pointer">
                     <input type="radio" name="fbs" checked={form.fasting_blood_sugar===String(i)} onChange={()=>set("fasting_blood_sugar",String(i))} className="text-red-600"/>
                     {l}
                   </label>
@@ -210,7 +244,7 @@ export default function PredictPage() {
               <label className="block text-xs font-medium text-gray-700 mb-1">Exercise-Induced Angina</label>
               <div className="flex gap-3 mt-2">
                 {["No","Yes"].map((l,i)=>(
-                  <label key={l} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                  <label key={l} className="flex items-center gap-1.5 text-sm text-gray-900 cursor-pointer">
                     <input type="radio" name="ang" checked={form.exercise_angina===String(i)} onChange={()=>set("exercise_angina",String(i))} className="text-red-600"/>
                     {l}
                   </label>
@@ -249,7 +283,14 @@ export default function PredictPage() {
           </div>
         </div>
 
-        <div className="flex gap-3 justify-end">
+        <div className="flex gap-3 justify-end items-center flex-wrap">
+          <span className="text-xs text-gray-500 mr-1">Load sample:</span>
+          <button type="button" onClick={()=>loadTemplate("low")}
+            className="px-3 py-2 border border-green-300 text-green-700 hover:bg-green-50 rounded-lg text-xs font-medium">Low Risk</button>
+          <button type="button" onClick={()=>loadTemplate("medium")}
+            className="px-3 py-2 border border-amber-300 text-amber-700 hover:bg-amber-50 rounded-lg text-xs font-medium">Medium Risk</button>
+          <button type="button" onClick={()=>loadTemplate("high")}
+            className="px-3 py-2 border border-red-300 text-red-700 hover:bg-red-50 rounded-lg text-xs font-medium">High Risk</button>
           <button type="button" onClick={()=>{ setForm({age:"",sex:"1",chest_pain_type:"0",resting_bp:"",cholesterol:"",fasting_blood_sugar:"0",resting_ecg:"0",max_heart_rate:"",exercise_angina:"0",st_depression:"0",st_slope:"0",vessels_count:"0",thalassemia:"2"}); setSelectedPatient(null); setSearch(""); setNewPatient({first_name:"",last_name:"",date_of_birth:""}); }}
             className="px-5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Clear Form</button>
           <button type="submit" disabled={loading}
@@ -258,19 +299,6 @@ export default function PredictPage() {
           </button>
         </div>
       </form>
-    </div>
-  );
-}
-
-function Inp({label,type,value,onChange,min,max,step,placeholder,required,hint}){
-  return (
-    <div>
-      <label className="block text-xs font-medium text-gray-700 mb-1">
-        {label}{required && <span className="text-red-600 ml-0.5">*</span>}
-        {hint && <span className="text-gray-400 ml-1 font-normal">{hint}</span>}
-      </label>
-      <input type={type} value={value} onChange={e=>onChange(e.target.value)} min={min} max={max} step={step} placeholder={placeholder} required={required}
-        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"/>
     </div>
   );
 }

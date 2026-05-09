@@ -51,35 +51,53 @@ def load_data():
     """
     CONCEPT: Dataset
     ─────────────────
-    The UCI Heart Disease dataset has 303 patient records.
-    Each row = 1 patient
-    Each column = 1 health measurement
-    Last column = does this patient have heart disease? (0 or 1)
+    The full UCI Heart Disease dataset has 4 sub-datasets:
+      Cleveland (303), Hungarian (294), Switzerland (123), VA Long Beach (200)
+    Combined: ~920 patient records — 3× the data of Cleveland alone.
 
-    We convert 0/1 into Low/Medium/High risk using simple rules.
+    Each row = 1 patient. 13 features + 1 target column.
+    Hungarian/Switzerland/VA use '?' for missing values; preprocess_data() handles those.
     """
     print("📂 Loading dataset...")
 
-    # UCI Heart Disease column names
     columns = [
         'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
         'restecg', 'thalach', 'exang', 'oldpeak', 'slope',
         'ca', 'thal', 'target'
     ]
 
-    # Try to load local file first, otherwise use built-in URL
-    local_path = os.path.join(os.path.dirname(__file__), "heart.csv")
+    base = os.path.dirname(__file__)
+    combined_path = os.path.join(base, "heart.csv")
+    uci_dir = os.path.join(base, "dataset_folders", "heart+disease")
 
-    if os.path.exists(local_path):
-        df = pd.read_csv(local_path)
-        print(f"  Loaded from local file: {df.shape[0]} rows")
+    # Cleveland + Hungarian only — Switzerland & VA have heavy missing values
+    # in `ca` and `thal` (the strongest features), which hurt accuracy when imputed.
+    sources = [
+        ("Cleveland", os.path.join(uci_dir, "processed.cleveland.data")),
+        ("Hungarian", os.path.join(uci_dir, "processed.hungarian.data")),
+    ]
+
+    available = [(name, path) for name, path in sources if os.path.exists(path)]
+
+    if available:
+        frames = []
+        for name, path in available:
+            sub = pd.read_csv(path, header=None, names=columns, na_values="?")
+            sub["source"] = name
+            print(f"  {name:<12} {sub.shape[0]:>4} rows  ← {os.path.basename(path)}")
+            frames.append(sub)
+        df = pd.concat(frames, ignore_index=True).drop(columns=["source"])
+        print(f"  Combined total: {df.shape[0]} rows from {len(available)} dataset(s)")
+        df.to_csv(combined_path, index=False)
+        print(f"  Saved combined CSV to {combined_path}")
+    elif os.path.exists(combined_path):
+        df = pd.read_csv(combined_path)
+        print(f"  Loaded cached heart.csv: {df.shape[0]} rows")
     else:
-        # Use the Cleveland Heart Disease data (most common version)
         url = "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data"
-        df = pd.read_csv(url, header=None, names=columns)
-        print(f"  Downloaded from UCI: {df.shape[0]} rows")
-        df.to_csv(local_path, index=False)
-        print(f"  Saved locally to {local_path}")
+        df = pd.read_csv(url, header=None, names=columns, na_values="?")
+        print(f"  Downloaded from UCI (Cleveland only): {df.shape[0]} rows")
+        df.to_csv(combined_path, index=False)
 
     return df
 

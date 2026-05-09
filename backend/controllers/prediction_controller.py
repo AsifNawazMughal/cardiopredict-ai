@@ -54,11 +54,20 @@ def run_prediction(db: Session, health_data: HealthDataInput, user_id: int) -> d
         db.rollback()
         raise HTTPException(status_code=503, detail=f"Model error: {e}. Run training first.")
 
-    # Look up model record
+    # Look up — or create — the model registry row so the prediction can link to it
     ml_model = db.query(MLModel).filter(
         MLModel.model_type == MODEL_TYPE_MAP[health_data.model_type],
         MLModel.is_active == True
     ).first()
+    if not ml_model:
+        ml_model = MLModel(
+            model_name=health_data.model_type,
+            model_type=MODEL_TYPE_MAP[health_data.model_type],
+            is_active=True,
+            version="1.0",
+        )
+        db.add(ml_model)
+        db.flush()
 
     # Save prediction
     pred = Prediction(
@@ -162,8 +171,10 @@ def get_history(db: Session, user_id: int, patient_id: Optional[int] = None,
         query = query.filter(Prediction.patient_id == patient_id)
     preds = query.order_by(Prediction.predicted_at.desc()).offset(skip).limit(limit).all()
 
-    return [
-        {
+    rows = []
+    for p in preds:
+        hp = p.health_parameter
+        rows.append({
             "id": p.id,
             "patient_id": p.patient_id,
             "patient_name": f"{p.patient.first_name} {p.patient.last_name}" if p.patient else "Unknown",
@@ -174,9 +185,22 @@ def get_history(db: Session, user_id: int, patient_id: Optional[int] = None,
             "probability_high": round((p.risk_score_high or 0) * 100, 1),
             "model_used": p.ml_model.model_type.value if p.ml_model else "Unknown",
             "predicted_at": p.predicted_at.isoformat(),
-        }
-        for p in preds
-    ]
+            # Heart-CSV-compatible feature columns (None if health data is missing)
+            "age": hp.age if hp else None,
+            "sex": hp.gender if hp else None,
+            "cp": hp.chest_pain_type if hp else None,
+            "trestbps": hp.resting_bp if hp else None,
+            "chol": hp.cholesterol if hp else None,
+            "fbs": hp.fasting_blood_sugar if hp else None,
+            "restecg": hp.resting_ecg if hp else None,
+            "thalach": hp.max_heart_rate if hp else None,
+            "exang": hp.exercise_angina if hp else None,
+            "oldpeak": hp.st_depression if hp else None,
+            "slope": hp.st_slope if hp else None,
+            "ca": hp.vessels_count if hp else None,
+            "thal": hp.thalassemia if hp else None,
+        })
+    return rows
 
 
 def get_models_performance() -> dict:
