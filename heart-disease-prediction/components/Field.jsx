@@ -46,7 +46,13 @@ export default function Field({
         />
         {status === "checking" && <Loader2 className={`absolute ${statusRight} top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin`} />}
         {status === "available" && <Check className={`absolute ${statusRight} top-1/2 -translate-y-1/2 w-4 h-4 text-green-500`} />}
-        {status === "taken" && <X className={`absolute ${statusRight} top-1/2 -translate-y-1/2 w-4 h-4 text-red-500`} />}
+        {status === "taken" && (
+          <button type="button" onClick={() => onChange("")} tabIndex={-1}
+            className={`absolute ${statusRight} top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700`}
+            aria-label="Clear field">
+            <X className="w-4 h-4"/>
+          </button>
+        )}
         {isPassword && (
           <button type="button" onClick={() => setShow(s => !s)} tabIndex={-1}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"

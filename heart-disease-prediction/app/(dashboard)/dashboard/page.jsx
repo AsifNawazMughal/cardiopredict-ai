@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { predictionsApi, patientsApi, getUser } from "../../lib/api";
 import { Doughnut, Line } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Filler } from "chart.js";
+import RiskBadge from "@/components/RiskBadge";
+import Button from "@/components/Button";
 import { Activity, Users, TrendingUp, AlertTriangle, ArrowRight, Plus, Eye } from "lucide-react";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Filler);
@@ -53,9 +55,9 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900">Welcome back, {displayName}</h1>
           <p className="text-gray-500 text-sm mt-0.5">{user?.hospital_name||"Heart Disease Prediction System"} · {new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})}</p>
         </div>
-        <button onClick={()=>router.push("/predict")} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+        <Button onClick={()=>router.push("/predict")}>
           <Plus className="w-4 h-4"/> New Prediction
-        </button>
+        </Button>
       </div>
 
       {/* Stats */}
@@ -127,12 +129,10 @@ export default function DashboardPage() {
             </thead>
             <tbody>
               {recent.map(h=>{
-                const rc = h.risk_class;
-                const badge = {Low:"bg-green-100 text-green-700",Medium:"bg-amber-100 text-amber-700",High:"bg-red-100 text-red-700"}[rc]||"bg-gray-100 text-gray-700";
                 return (
                   <tr key={h.id} className="border-t border-gray-100 hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-gray-900">{h.patient_name||"Unknown"}</td>
-                    <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${badge}`}>{h.risk_class}</span></td>
+                    <td className="px-4 py-3"><RiskBadge risk={h.risk_class}/></td>
                     <td className="px-4 py-3 text-gray-700">{h.confidence}%</td>
                     <td className="px-4 py-3 text-gray-500">{h.model_used}</td>
                     <td className="px-4 py-3 text-gray-500">{new Date(h.predicted_at).toLocaleDateString()}</td>

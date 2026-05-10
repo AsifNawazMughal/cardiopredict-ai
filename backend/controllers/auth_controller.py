@@ -86,13 +86,15 @@ def check_availability(db: Session, username: Optional[str] = None, email: Optio
     return result
 
 
-def authenticate_user(db: Session, username: str, password: str) -> User:
-    """Verify credentials. Raises 401 if invalid."""
-    user = db.query(User).filter(User.username == username).first()
+def authenticate_user(db: Session, username_or_email: str, password: str) -> User:
+    """Verify credentials. The first arg can be either a username or an email. Raises 401 if invalid."""
+    user = db.query(User).filter(
+        (User.username == username_or_email) | (User.email == username_or_email)
+    ).first()
     if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect username/email or password",
         )
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Account is disabled")

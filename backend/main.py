@@ -27,6 +27,7 @@ from database.db import engine, Base
 from database.models import *   # import all models so tables get created
 from routes import auth, patients, predictions
 from ml.predict import prediction_engine
+from admin import setup_admin
 
 
 # ─── LIFESPAN (startup/shutdown) ──────────────────────────────────────────────
@@ -114,6 +115,11 @@ app.add_middleware(
 app.include_router(auth.router)          # /auth/register, /auth/login, /auth/me
 app.include_router(patients.router)      # /patients/
 app.include_router(predictions.router)   # /predictions/predict, /predictions/history
+
+
+# ─── ADMIN PANEL ──────────────────────────────────────────────────────────────
+# Mounted at /admin — auto-generated UI over SQLAlchemy models, role=admin only.
+setup_admin(app)
 
 
 # ─── STATIC FILES (Reports) ───────────────────────────────────────────────────

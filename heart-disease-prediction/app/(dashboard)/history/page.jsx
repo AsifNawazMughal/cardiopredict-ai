@@ -1,15 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import * as XLSX from "xlsx";
 import { predictionsApi } from "../../lib/api";
+import RiskBadge from "@/components/RiskBadge";
+import Button from "@/components/Button";
 import { Clock, Search, Eye, GitCompare, Download, Filter } from "lucide-react";
-
-const RISK_BADGE = {
-  Low:"bg-green-100 text-green-700 border-green-200",
-  Medium:"bg-amber-100 text-amber-700 border-amber-200",
-  High:"bg-red-100 text-red-700 border-red-200",
-};
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -38,7 +33,7 @@ export default function HistoryPage() {
     else if(selected.length===1) router.push(`/results/${selected[0]}`);
   }
 
-  function exportExcel(){
+  function exportCSV(){
     // patient_name first, then heart.csv feature columns, then prediction outputs
     const header = [
       "patient_name",
@@ -54,20 +49,20 @@ export default function HistoryPage() {
       h.model_used, h.predicted_at,
     ]);
 
-    const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+    const escape = (v) => {
+      if (v === null || v === undefined) return "";
+      const s = String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const csv = [header, ...rows].map(r => r.map(escape).join(",")).join("\n");
 
-    // Auto-size columns: pick the widest cell value (header or row) per column, capped to 50
-    ws["!cols"] = header.map((h, i) => {
-      const maxLen = Math.max(
-        String(h).length,
-        ...rows.map(r => (r[i] === null || r[i] === undefined) ? 0 : String(r[i]).length),
-      );
-      return { wch: Math.min(Math.max(maxLen + 2, 8), 50) };
-    });
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Predictions");
-    XLSX.writeFile(wb, "predictions.xlsx");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "predictions.csv";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -79,14 +74,14 @@ export default function HistoryPage() {
         </div>
         <div className="flex gap-2">
           {selected.length>0 && (
-            <button onClick={handleCompare} className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+            <Button variant="blue" onClick={handleCompare}>
               <GitCompare className="w-4 h-4"/>
               {selected.length===2?"Compare 2 Results":"View Result"}
-            </button>
+            </Button>
           )}
-          <button onClick={exportExcel} className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
-            <Download className="w-4 h-4"/> Export Excel
-          </button>
+          <Button variant="outline" onClick={exportCSV}>
+            <Download className="w-4 h-4"/> Export CSV
+          </Button>
         </div>
       </div>
 
@@ -131,8 +126,6 @@ export default function HistoryPage() {
             ) : filtered.length===0 ? (
               <tr><td colSpan={11} className="text-center py-12 text-gray-400">No predictions found</td></tr>
             ) : filtered.map((h,i)=>{
-              const rc = h.risk_class ;
-              const badge = RISK_BADGE[rc]||"bg-gray-100 text-gray-700 border-gray-200";
               const isSelected = selected.includes(h.id);
               return (
                 <tr key={h.id} className={`border-t border-gray-100 transition-colors ${isSelected?"bg-blue-50":"hover:bg-gray-50"}`}>
@@ -142,7 +135,7 @@ export default function HistoryPage() {
                   </td>
                   <td className="px-3 py-3 text-gray-400 text-xs">#{i+1}</td>
                   <td className="px-3 py-3 font-medium text-gray-900">{h.patient_name}</td>
-                  <td className="px-3 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${badge}`}>{h.risk_class}</span></td>
+                  <td className="px-3 py-3"><RiskBadge risk={h.risk_class}/></td>
                   <td className="px-3 py-3 font-semibold text-gray-900">{h.confidence}%</td>
                   <td className="px-3 py-3 text-green-700">{h.probability_low}%</td>
                   <td className="px-3 py-3 text-amber-700">{h.probability_medium}%</td>

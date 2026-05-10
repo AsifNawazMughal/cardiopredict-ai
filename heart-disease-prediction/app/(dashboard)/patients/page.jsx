@@ -152,7 +152,7 @@ export default function PatientsPage() {
             <h3 className="font-bold text-gray-900 mb-1">Delete Patient?</h3>
             <p className="text-gray-500 text-sm mb-5">This will also delete all prediction records for this patient.</p>
             <div className="flex gap-3">
-              <button onClick={()=>setDeleteId(null)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm">Cancel</button>
+              <button onClick={()=>setDeleteId(null)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
               <button onClick={()=>handleDelete(deleteId)} className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium">Delete</button>
             </div>
           </div>

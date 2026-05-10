@@ -1,17 +1,20 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { getToken, getUser, authApi } from "../lib/api";
 import { Heart, LayoutDashboard, Activity, Clock, LogOut, Users, UserCog } from "lucide-react";
 
+const noopSubscribe = () => () => {};
+
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState(null);
+  // useSyncExternalStore reads from localStorage on the client and returns null on the server,
+  // avoiding both the hydration mismatch and the React Compiler's set-state-in-effect warning.
+  const user = useSyncExternalStore(noopSubscribe, getUser, () => null);
   useEffect(() => {
-    if (!getToken()) { router.push("/login"); return; }
-    setUser(getUser());
+    if (!getToken()) router.push("/login");
   }, [router]);
   const displayName = user?.first_name && user?.last_name ? `Dr. ${user.first_name} ${user.last_name}` : `Dr. ${user?.username || ""}`;
   const navItems = [
