@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 8000
 
 # Render and most PaaS hosts inject $PORT at runtime. Default to 8000 locally.
-CMD ["sh", "-c", "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
