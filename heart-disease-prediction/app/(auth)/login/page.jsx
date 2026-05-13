@@ -10,6 +10,7 @@ import LoginFields from "./_components/LoginFields";
 import RegisterStep1 from "./_components/RegisterStep1";
 import RegisterStep2 from "./_components/RegisterStep2";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import Footer from "@/components/Footer";
 
 const EMPTY_FORM = {
   username: "", email: "", password: "", confirm_password: "",
@@ -121,7 +122,7 @@ export default function LoginPage() {
   function switchMode(m) { setMode(m); setStep(1); }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-pink-100 flex flex-col items-center justify-center p-4 relative pb-16">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
         <AuthHeader/>
         <div className="p-6">
@@ -165,6 +166,14 @@ export default function LoginPage() {
             </button>
           </p>
         </div>
+      </div>
+      <div className="mt-4">
+        <a href="/about" className="text-xs text-gray-500 hover:text-red-600 transition-colors">
+          About this project →
+        </a>
+      </div>
+      <div className="absolute bottom-0 left-0 right-0">
+        <Footer />
       </div>
     </div>
   );

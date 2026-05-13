@@ -7,7 +7,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata = {
   title: "CardioPredict AI",
-  description: "Heart Disease Prediction System — CS619 FYP",
+  description: "Heart Disease Risk Assessment System — interpretable ML for cardiovascular risk classification.",
 };
 
 export default function RootLayout({ children }) {

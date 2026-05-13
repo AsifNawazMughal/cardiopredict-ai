@@ -3,7 +3,8 @@ import { useEffect, useSyncExternalStore } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { getToken, getUser, authApi } from "../lib/api";
-import { Heart, LayoutDashboard, Activity, Clock, LogOut, Users, UserCog } from "lucide-react";
+import { Heart, LayoutDashboard, Activity, Clock, LogOut, Users, UserCog, Info } from "lucide-react";
+import Footer from "@/components/Footer";
 
 const noopSubscribe = () => () => {};
 
@@ -23,19 +24,17 @@ export default function DashboardLayout({ children }) {
     { href: "/patients",  icon: Users,           label: "Patients" },
     { href: "/history",   icon: Clock,           label: "History" },
     { href: "/profile",   icon: UserCog,         label: "Profile" },
+    { href: "/about",     icon: Info,            label: "About" },
   ];
   return (
     <div className="flex h-screen bg-gray-50">
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-5 border-b border-gray-200">
+        <div className="p-5 bg-gradient-to-br from-red-600 to-rose-600 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center">
-              <Heart className="w-5 h-5 text-red-600" fill="currentColor"/>
+            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+              <Heart className="w-5 h-5 text-white" fill="currentColor"/>
             </div>
-            <div>
-              <p className="font-bold text-gray-900 text-sm">CardioPredict AI</p>
-              <p className="text-xs text-gray-400">CS619 — FYP</p>
-            </div>
+            <p className="font-bold text-base">CardioPredict AI</p>
           </div>
         </div>
         <nav className="flex-1 p-3 space-y-0.5">
@@ -48,18 +47,21 @@ export default function DashboardLayout({ children }) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-gray-200">
-          <div className="mb-2">
-            <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
-            <p className="text-xs text-gray-400 truncate">{user?.specialization || user?.role}</p>
-            {user?.hospital_name && <p className="text-xs text-gray-400 truncate">{user.hospital_name}</p>}
+        <div className="p-4 bg-gradient-to-br from-red-600 to-rose-600 text-white">
+          <div className="mb-3">
+            <p className="text-sm font-semibold truncate">{displayName}</p>
+            <p className="text-xs text-red-100 truncate">{user?.specialization || user?.role}</p>
+            {user?.hospital_name && <p className="text-xs text-red-100 truncate">{user.hospital_name}</p>}
           </div>
-          <button onClick={() => { authApi.logout(); router.push("/login"); }} className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-600 transition-colors">
+          <button onClick={() => { authApi.logout(); router.push("/login"); }} className="flex items-center gap-2 text-sm text-red-100 hover:text-white transition-colors font-medium">
             <LogOut className="w-4 h-4"/> Sign out
           </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto flex flex-col">
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </main>
     </div>
   );
 }
