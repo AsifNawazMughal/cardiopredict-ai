@@ -104,7 +104,10 @@ export default function LoginPage() {
           specialization: form.specialization, hospital_name: form.hospital_name,
           phone: form.phone, license_number: form.license_number,
         });
-        router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
+        toast.success("Account created successfully");
+        await authApi.login(form.username, form.password);
+        toast.success(`Welcome, Dr. ${form.first_name}!`);
+        router.push("/dashboard");
         return;
       }
       const data = await authApi.login(form.username, form.password);

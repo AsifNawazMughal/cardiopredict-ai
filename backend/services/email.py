@@ -1,15 +1,24 @@
-"""Email service — sends verification emails via Resend."""
+"""Email service — sends verification emails via Gmail SMTP (or any SMTP server).
+
+Gmail config (free, ~500 emails/day):
+  SMTP_HOST=smtp.gmail.com
+  SMTP_PORT=587
+  SMTP_USER=your.address@gmail.com
+  SMTP_PASSWORD=<16-char app password from https://myaccount.google.com/apppasswords>
+  EMAIL_FROM=CardioPredict AI <your.address@gmail.com>
+"""
 import os
-import resend
+import smtplib
+import ssl
+from email.message import EmailMessage
 
 
-RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-EMAIL_FROM = os.getenv("EMAIL_FROM", "CardioPredict AI <onboarding@resend.dev>")
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+EMAIL_FROM = os.getenv("EMAIL_FROM") or (f"CardioPredict AI <{SMTP_USER}>" if SMTP_USER else None)
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-
-
-if RESEND_API_KEY:
-    resend.api_key = RESEND_API_KEY
 
 
 def _verification_email_html(name: str, verify_url: str) -> str:
@@ -22,7 +31,7 @@ def _verification_email_html(name: str, verify_url: str) -> str:
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.06);">
         <tr>
           <td style="background:linear-gradient(135deg,#dc2626,#e11d48);padding:32px;text-align:center;">
-            <div style="font-size:32px;margin-bottom:8px;">❤️</div>
+            <div style="font-size:32px;margin-bottom:8px;">&#10084;&#65039;</div>
             <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">CardioPredict AI</h1>
           </td>
         </tr>
@@ -47,7 +56,7 @@ def _verification_email_html(name: str, verify_url: str) -> str:
         </tr>
         <tr>
           <td style="background:#f9fafb;padding:16px;text-align:center;color:#9ca3af;font-size:12px;border-top:1px solid #e5e7eb;">
-            CardioPredict AI — a portfolio project by Asif Nawaz
+            CardioPredict AI &mdash; a portfolio project by Asif Nawaz
           </td>
         </tr>
       </table>
@@ -58,17 +67,27 @@ def _verification_email_html(name: str, verify_url: str) -> str:
 
 
 def send_verification_email(*, to: str, name: str, token: str) -> None:
-    """Send an account-verification email. Raises if RESEND_API_KEY missing."""
-    if not RESEND_API_KEY:
+    """Send an account-verification email via SMTP. Raises if SMTP creds missing or send fails."""
+    if not SMTP_USER or not SMTP_PASSWORD:
         raise RuntimeError(
-            "RESEND_API_KEY is not configured — cannot send verification email"
+            "SMTP_USER / SMTP_PASSWORD not configured — cannot send verification email"
         )
 
     verify_url = f"{FRONTEND_URL.rstrip('/')}/verify-email?token={token}"
 
-    resend.Emails.send({
-        "from": EMAIL_FROM,
-        "to": [to],
-        "subject": "Verify your CardioPredict AI account",
-        "html": _verification_email_html(name=name or "there", verify_url=verify_url),
-    })
+    msg = EmailMessage()
+    msg["From"] = EMAIL_FROM
+    msg["To"] = to
+    msg["Subject"] = "Verify your CardioPredict AI account"
+    msg.set_content(
+        f"Hi {name},\n\n"
+        f"Verify your CardioPredict AI account by opening this link:\n{verify_url}\n\n"
+        f"This link expires in 24 hours. If you didn't sign up, ignore this email."
+    )
+    msg.add_alternative(_verification_email_html(name=name or "there", verify_url=verify_url), subtype="html")
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as server:
+        server.starttls(context=context)
+        server.login(SMTP_USER, SMTP_PASSWORD)
+        server.send_message(msg)

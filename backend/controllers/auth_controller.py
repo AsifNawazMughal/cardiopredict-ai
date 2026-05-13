@@ -164,11 +164,9 @@ def authenticate_user(db: Session, username_or_email: str, password: str) -> Use
         )
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Account is disabled")
-    if not user.email_verified:
-        raise HTTPException(
-            status_code=403,
-            detail="Please verify your email before logging in. Check your inbox for the verification link.",
-        )
+    # NOTE: email verification gate disabled — free-tier email providers can't
+    # deliver to arbitrary recipients without a verified domain. The schema and
+    # /auth/verify-email endpoint stay in place so this can be re-enabled later.
     return user
 
 
