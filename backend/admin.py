@@ -4,7 +4,6 @@ Admin panel mounted at /admin
 Auto-generated UI over SQLAlchemy models, gated by an `admin` role on User.
 After login, redirects straight to the Users list.
 """
-import os
 from itsdangerous import TimestampSigner, BadSignature
 from sqladmin import Admin, ModelView
 from sqladmin.authentication import AuthenticationBackend
@@ -18,10 +17,9 @@ from database.db import engine, SessionLocal
 from database.models.user import User, UserRole
 from database.models.patient import Patient
 from database.models.prediction import Prediction
-from controllers.auth_controller import authenticate_user
+from controllers.auth_controller import authenticate_user, SECRET_KEY as ADMIN_SECRET
 
 load_dotenv()
-ADMIN_SECRET = os.getenv("SECRET_KEY", "changeme")
 
 
 # ─── Auth backend ─────────────────────────────────────────────────────────────

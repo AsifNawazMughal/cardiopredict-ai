@@ -18,7 +18,6 @@ class HealthDataInput(BaseModel):
     st_slope: int = Field(..., ge=0, le=2)
     vessels_count: int = Field(..., ge=0, le=3)
     thalassemia: int = Field(..., ge=0, le=3)
-    model_type: str = Field("ANN")
 
 
 class PredictionHistoryItem(BaseModel):

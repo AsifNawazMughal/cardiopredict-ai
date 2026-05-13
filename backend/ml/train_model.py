@@ -1,23 +1,11 @@
 """
 AI MODEL TRAINING
 =================
-This script:
-1. Downloads/loads the UCI Heart Disease dataset
-2. Cleans and prepares the data
-3. Trains 3 models: ANN, Logistic Regression, Random Forest
-4. Saves the trained models to files (so we can use them later)
+Trains a Logistic Regression classifier on the UCI Heart Disease dataset
+and saves the model + preprocessing artifacts to disk for the API to load.
 
-CONCEPT: Machine Learning in simple terms
-─────────────────────────────────────────
-Imagine you have 1000 patient records where you already KNOW
-who has heart disease and who doesn't (this is "labeled data").
-
-You SHOW this data to the AI model.
-The model learns PATTERNS from it.
-After training, give it a NEW patient — it predicts based on patterns it learned.
-
-It's like teaching a student with 1000 examples, then giving them an exam
-with a new question they haven't seen before.
+Run:
+    python ml/train_model.py
 """
 
 import pandas as pd
@@ -25,19 +13,13 @@ import numpy as np
 import pickle
 import os
 import json
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score,
-    f1_score, roc_auc_score, classification_report, confusion_matrix
+    f1_score, roc_auc_score, classification_report
 )
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers, regularizers
-import matplotlib.pyplot as plt
-import seaborn as sns
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -199,118 +181,7 @@ def preprocess_data(df):
     print(f"  Testing set:  {X_test.shape[0]} samples")
 
     return X_train, X_test, y_train, y_test, feature_columns
-
-
-# ─── STEP 3A: TRAIN ANN (Deep Learning) ──────────────────────────────────────
-def train_ann(X_train, X_test, y_train, y_test):
-    """
-    CONCEPT: Artificial Neural Network (ANN)
-    ─────────────────────────────────────────
-    An ANN is inspired by the human brain.
-    It has layers of "neurons" that pass information forward.
-
-    Input layer:   13 neurons (one for each health measurement)
-       ↓
-    Hidden layer:  128 neurons (finds patterns)
-       ↓
-    Hidden layer:  64 neurons (refines patterns)
-       ↓
-    Hidden layer:  32 neurons (more refinement)
-       ↓
-    Output layer:  3 neurons (Low / Medium / High probability)
-
-    DROPOUT:
-    During training, we randomly "turn off" 30% of neurons each step.
-    This forces the network to NOT rely on any single neuron.
-    Result: better generalization, less overfitting.
-
-    REGULARIZATION (L2):
-    Adds a penalty for very large weights.
-    Prevents the model from becoming too complex and memorizing training data.
-    """
-    print("\n🧠 Training ANN (Deep Learning)...")
-
-    num_classes = 3  # Low, Medium, High
-
-    # Convert labels to "one-hot encoding"
-    # Example: class 2 (High) → [0, 0, 1]
-    y_train_cat = keras.utils.to_categorical(y_train, num_classes)
-    y_test_cat = keras.utils.to_categorical(y_test, num_classes)
-
-    # Build the neural network
-    model = keras.Sequential([
-        # Input layer — 13 features
-        layers.Input(shape=(X_train.shape[1],)),
-
-        # Hidden layer 1: 128 neurons
-        # kernel_regularizer=L2 → penalty for large weights (prevents overfitting)
-        layers.Dense(128, activation='relu',
-                     kernel_regularizer=regularizers.l2(0.001)),
-        layers.BatchNormalization(),   # normalize activations (training stability)
-        layers.Dropout(0.3),           # randomly turn off 30% of neurons
-
-        # Hidden layer 2: 64 neurons
-        layers.Dense(64, activation='relu',
-                     kernel_regularizer=regularizers.l2(0.001)),
-        layers.BatchNormalization(),
-        layers.Dropout(0.3),
-
-        # Hidden layer 3: 32 neurons
-        layers.Dense(32, activation='relu'),
-        layers.Dropout(0.2),
-
-        # Output layer: 3 neurons (one per class)
-        # softmax = converts outputs to probabilities that sum to 1.0
-        # e.g., [0.1, 0.2, 0.7] → 70% chance High risk
-        layers.Dense(num_classes, activation='softmax')
-    ])
-
-    # Compile: tell the model HOW to learn
-    # optimizer='adam' = smart learning rate adjustment
-    # loss='categorical_crossentropy' = measures how wrong the predictions are
-    model.compile(
-        optimizer='adam',
-        loss='categorical_crossentropy',
-        metrics=['accuracy']
-    )
-
-    model.summary()
-
-    # Train the model
-    # epoch = one full pass through all training data
-    # batch_size = how many samples to process at once before updating weights
-    history = model.fit(
-        X_train, y_train_cat,
-        epochs=100,
-        batch_size=16,
-        validation_split=0.1,   # use 10% of training data to monitor overfitting
-        verbose=1,
-        callbacks=[
-            # EarlyStopping: stop if no improvement for 15 epochs (saves time)
-            keras.callbacks.EarlyStopping(patience=15, restore_best_weights=True),
-            # ReduceLROnPlateau: slow down learning when stuck
-            keras.callbacks.ReduceLROnPlateau(patience=7, factor=0.5)
-        ]
-    )
-
-    # Evaluate on test set
-    y_pred_proba = model.predict(X_test)
-    y_pred = np.argmax(y_pred_proba, axis=1)   # pick the class with highest probability
-
-    metrics = calculate_metrics(y_test, y_pred, y_pred_proba, "ANN")
-
-    # Save model
-    model_path = os.path.join(MODELS_DIR, "ann_model.keras")
-    model.save(model_path)
-    print(f"  ANN saved to {model_path}")
-
-    # Save training history plot
-    save_training_plot(history, "ANN")
-
-    return metrics, model_path
-
-
-# ─── STEP 3B: TRAIN LOGISTIC REGRESSION ──────────────────────────────────────
+# ─── STEP 3: TRAIN LOGISTIC REGRESSION ───────────────────────────────────────
 def train_logistic_regression(X_train, X_test, y_train, y_test):
     """
     CONCEPT: Logistic Regression
@@ -318,8 +189,9 @@ def train_logistic_regression(X_train, X_test, y_train, y_test):
     Despite the name, it's used for CLASSIFICATION not regression.
     It's the simplest ML model — like drawing a line to separate groups.
 
-    We use it as a "baseline": if our ANN isn't better than this simple model,
-    something is wrong with our ANN.
+    Logistic regression is the standard model used in real cardiovascular
+    risk equations (Framingham, ASCVD) — interpretable coefficients,
+    robust on small samples.
 
     lbfgs solver handles multi-class (Low/Medium/High) natively
     """
@@ -344,60 +216,6 @@ def train_logistic_regression(X_train, X_test, y_train, y_test):
     with open(model_path, 'wb') as f:
         pickle.dump(model, f)
     print(f"  Logistic Regression saved to {model_path}")
-
-    return metrics, model_path
-
-
-# ─── STEP 3C: TRAIN RANDOM FOREST ────────────────────────────────────────────
-def train_random_forest(X_train, X_test, y_train, y_test):
-    """
-    CONCEPT: Random Forest
-    ───────────────────────
-    Random Forest = many Decision Trees working together (ensemble method).
-
-    A Decision Tree is like a flowchart:
-      Is age > 55?
-        Yes → Is cholesterol > 240?
-                Yes → High Risk
-                No  → Medium Risk
-        No  → Low Risk
-
-    Random Forest builds 100 such trees, each learning slightly different patterns.
-    Final prediction = majority vote of all 100 trees.
-
-    This is very accurate because many imperfect models together > one perfect model.
-    """
-    print("\n🌲 Training Random Forest...")
-
-    model = RandomForestClassifier(
-        n_estimators=100,    # 100 decision trees
-        max_depth=10,        # limit tree depth (prevents overfitting)
-        min_samples_split=5,
-        random_state=42,
-        n_jobs=-1            # use all CPU cores for faster training
-    )
-
-    model.fit(X_train, y_train)
-
-    y_pred = model.predict(X_test)
-    y_pred_proba = model.predict_proba(X_test)
-
-    metrics = calculate_metrics(y_test, y_pred, y_pred_proba, "Random Forest")
-
-    # Feature importance — which medical measurements matter most?
-    feature_names = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
-                     'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
-    importances = model.feature_importances_
-    print("\n  Feature Importance (which measurements matter most):")
-    for name, imp in sorted(zip(feature_names, importances), key=lambda x: -x[1]):
-        bar = "█" * int(imp * 50)
-        print(f"    {name:15s}: {bar} {imp:.3f}")
-
-    # Save model
-    model_path = os.path.join(MODELS_DIR, "random_forest.pkl")
-    with open(model_path, 'wb') as f:
-        pickle.dump(model, f)
-    print(f"  Random Forest saved to {model_path}")
 
     return metrics, model_path
 
@@ -448,29 +266,6 @@ def calculate_metrics(y_true, y_pred, y_pred_proba, model_name):
     }
 
 
-# ─── HELPER: SAVE TRAINING PLOT ──────────────────────────────────────────────
-def save_training_plot(history, model_name):
-    """Save accuracy and loss curves during ANN training"""
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
-
-    ax1.plot(history.history['accuracy'], label='Train')
-    ax1.plot(history.history['val_accuracy'], label='Validation')
-    ax1.set_title(f'{model_name} - Accuracy')
-    ax1.set_xlabel('Epoch')
-    ax1.legend()
-
-    ax2.plot(history.history['loss'], label='Train')
-    ax2.plot(history.history['val_loss'], label='Validation')
-    ax2.set_title(f'{model_name} - Loss')
-    ax2.set_xlabel('Epoch')
-    ax2.legend()
-
-    plot_path = os.path.join(MODELS_DIR, f"{model_name.lower()}_training.png")
-    plt.savefig(plot_path, dpi=100, bbox_inches='tight')
-    plt.close()
-    print(f"  Training plot saved to {plot_path}")
-
-
 # ─── MAIN: RUN EVERYTHING ────────────────────────────────────────────────────
 def main():
     print("=" * 60)
@@ -483,18 +278,11 @@ def main():
     # Step 2: Preprocess
     X_train, X_test, y_train, y_test = preprocess_data(df)[:4]
 
-    # Step 3: Train all 3 models
-    ann_metrics, ann_path = train_ann(X_train, X_test, y_train, y_test)
+    # Step 3: Train logistic regression
     lr_metrics, lr_path = train_logistic_regression(X_train, X_test, y_train, y_test)
-    rf_metrics, rf_path = train_random_forest(X_train, X_test, y_train, y_test)
 
     # Step 4: Save metrics summary
-    summary = {
-        "ANN": {**ann_metrics, "path": ann_path},
-        "LogisticRegression": {**lr_metrics, "path": lr_path},
-        "RandomForest": {**rf_metrics, "path": rf_path}
-    }
-
+    summary = {"LogisticRegression": {**lr_metrics, "path": lr_path}}
     summary_path = os.path.join(MODELS_DIR, "models_summary.json")
     with open(summary_path, 'w') as f:
         json.dump(summary, f, indent=2)
@@ -502,13 +290,8 @@ def main():
     print("\n" + "=" * 60)
     print("  TRAINING COMPLETE!")
     print("=" * 60)
-    print(f"\n  Model Comparison:")
-    print(f"  {'Model':<25} {'Accuracy':<12} {'F1 Score':<12} {'ROC-AUC'}")
-    print(f"  {'-'*60}")
-    for name, m in summary.items():
-        print(f"  {name:<25} {m['accuracy']:<12} {m['f1_score']:<12} {m['roc_auc']}")
-
-    print(f"\n  All models saved in: {MODELS_DIR}")
+    print(f"\n  Accuracy: {lr_metrics['accuracy']}  F1: {lr_metrics['f1_score']}  ROC-AUC: {lr_metrics['roc_auc']}")
+    print(f"  Model saved in: {MODELS_DIR}")
     print(f"  Summary saved to: {summary_path}")
 
 

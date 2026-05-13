@@ -7,9 +7,7 @@ from database.db import Base
 
 
 class ModelType(str, enum.Enum):
-    ann = "ANN"
     logistic_regression = "LogisticRegression"
-    random_forest = "RandomForest"
 
 
 class MLModel(Base):

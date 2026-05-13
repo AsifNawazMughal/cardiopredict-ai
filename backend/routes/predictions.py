@@ -6,7 +6,7 @@ from database.db import get_db
 from database.models.user import User
 from schemas.prediction_schemas import HealthDataInput
 from controllers.prediction_controller import (
-    run_prediction, run_all_models, get_history,
+    run_prediction, get_history,
     get_models_performance, get_prediction_by_id
 )
 from routes.auth import get_current_user
@@ -18,11 +18,6 @@ router = APIRouter(prefix="/predictions", tags=["Predictions"])
 def predict(health_data: HealthDataInput, db: Session = Depends(get_db),
             current_user: User = Depends(get_current_user)):
     return run_prediction(db, health_data, current_user.id)
-
-
-@router.post("/predict-all-models")
-def predict_all(health_data: HealthDataInput, current_user: User = Depends(get_current_user)):
-    return run_all_models(health_data)
 
 
 @router.get("/history")

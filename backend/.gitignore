@@ -14,11 +14,14 @@ venv/
 env/
 .env
 .env.*
+!.env.example
 
-# ML models (large binary files)
+# ML models (large binary files) — keep the active LR model + scaler tracked
 ml/saved_models/*.pkl
 ml/saved_models/*.h5
 ml/saved_models/*.keras
+!ml/saved_models/logistic_regression.pkl
+!ml/saved_models/scaler.pkl
 
 # Reports
 reports/

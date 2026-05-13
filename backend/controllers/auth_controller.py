@@ -29,7 +29,12 @@ from schemas.auth_schemas import UserCreate, UserProfileUpdate
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "changeme")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY or SECRET_KEY in {"changeme", "your_secret_key_here"}:
+    raise RuntimeError(
+        "SECRET_KEY environment variable is missing or insecure. "
+        "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(64))\""
+    )
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
 

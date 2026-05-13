@@ -11,18 +11,11 @@ from schemas.prediction_schemas import HealthDataInput
 from ml.predict import prediction_engine
 
 RISK_MAP = {"Low": RiskClass.low, "Medium": RiskClass.medium, "High": RiskClass.high}
-MODEL_TYPE_MAP = {
-    "ANN": ModelType.ann,
-    "LogisticRegression": ModelType.logistic_regression,
-    "RandomForest": ModelType.random_forest,
-}
+ACTIVE_MODEL = "LogisticRegression"
 
 
 def run_prediction(db: Session, health_data: HealthDataInput, user_id: int) -> dict:
-    """Run a single model prediction and persist results."""
-    valid_models = ["ANN", "LogisticRegression", "RandomForest"]
-    if health_data.model_type not in valid_models:
-        raise HTTPException(status_code=400, detail=f"Model must be one of {valid_models}")
+    """Run prediction and persist results."""
 
     # Save health parameters
     hp = HealthParameter(
@@ -44,25 +37,20 @@ def run_prediction(db: Session, health_data: HealthDataInput, user_id: int) -> d
     db.add(hp)
     db.flush()
 
-    # Run AI model
     try:
-        result = prediction_engine.predict(
-            patient_data=health_data.dict(),
-            model_type=health_data.model_type
-        )
+        result = prediction_engine.predict(patient_data=health_data.dict())
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=503, detail=f"Model error: {e}. Run training first.")
 
-    # Look up — or create — the model registry row so the prediction can link to it
     ml_model = db.query(MLModel).filter(
-        MLModel.model_type == MODEL_TYPE_MAP[health_data.model_type],
+        MLModel.model_type == ModelType.logistic_regression,
         MLModel.is_active == True
     ).first()
     if not ml_model:
         ml_model = MLModel(
-            model_name=health_data.model_type,
-            model_type=MODEL_TYPE_MAP[health_data.model_type],
+            model_name=ACTIVE_MODEL,
+            model_type=ModelType.logistic_regression,
             is_active=True,
             version="1.0",
         )
@@ -110,14 +98,6 @@ def run_prediction(db: Session, health_data: HealthDataInput, user_id: int) -> d
             "thalassemia": health_data.thalassemia,
         }
     }
-
-
-def run_all_models(health_data: HealthDataInput) -> dict:
-    """Run all 3 models and return comparison results."""
-    try:
-        return prediction_engine.predict_all_models(health_data.dict())
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Prediction error: {e}")
 
 
 def get_prediction_by_id(db: Session, prediction_id: int, user_id: int) -> dict:
@@ -204,8 +184,7 @@ def get_history(db: Session, user_id: int, patient_id: Optional[int] = None,
 
 
 def get_models_performance() -> dict:
-    from ml.predict import prediction_engine
-    metrics = prediction_engine.get_models_performance()
+    metrics = prediction_engine.get_model_performance()
     if not metrics:
-        raise HTTPException(status_code=404, detail="No trained models found.")
+        raise HTTPException(status_code=404, detail="No trained model found.")
     return metrics

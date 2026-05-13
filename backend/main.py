@@ -23,8 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import os
 
-from database.db import engine, Base
-from database.models import *   # import all models so tables get created
+import database.models  # noqa: F401 — ensure models are registered with SQLAlchemy
 from routes import auth, patients, predictions
 from ml.predict import prediction_engine
 from admin import setup_admin
@@ -42,20 +41,18 @@ from admin import setup_admin
 async def lifespan(app: FastAPI):
     # ── Startup ──────────────────────────────────────────────────────────────
     print("Starting Heart Disease Prediction API...")
-
-    Base.metadata.create_all(bind=engine)
-    print("Database tables created/verified")
+    print("Schema is managed by Alembic — run `alembic upgrade head` to apply migrations")
 
     models_dir = os.path.join(os.path.dirname(__file__), "ml", "saved_models")
-    ann_path = os.path.join(models_dir, "ann_model.keras")
-    if os.path.exists(ann_path):
+    lr_path = os.path.join(models_dir, "logistic_regression.pkl")
+    if os.path.exists(lr_path):
         try:
             prediction_engine.load_models()
-            print("ML models loaded")
+            print("ML model loaded")
         except Exception as e:
-            print(f"Could not load ML models: {e}")
+            print(f"Could not load ML model: {e}")
     else:
-        print("ML models not found. Run: python ml/train_model.py")
+        print("ML model not found. Run: python ml/train_model.py")
 
     yield   # server is running here
 
@@ -70,13 +67,8 @@ app = FastAPI(
     description="""
     ## Heart Disease Prediction System
 
-    This API powers the heart disease prediction web application.
-    It uses 3 ML models to classify patient risk as Low / Medium / High.
-
-    ### Models Available:
-    - **ANN** (Artificial Neural Network) — Deep Learning
-    - **Logistic Regression** — Statistical baseline
-    - **Random Forest** — Ensemble method
+    REST API for cardiovascular risk classification using a Logistic
+    Regression model trained on the UCI Heart Disease dataset.
 
     ### Quick Start:
     1. Register a user: `POST /auth/register`
@@ -96,12 +88,18 @@ app = FastAPI(
 # CORS middleware ALLOWS this by adding special headers to responses.
 # In production, replace "*" with your actual frontend URL.
 
+_cors_origins = [
+    o.strip()
+    for o in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001").split(",")
+    if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # Next.js dev server
+    allow_origins=_cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],     # allow GET, POST, PUT, DELETE, etc.
-    allow_headers=["*"],     # allow all headers including Authorization
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

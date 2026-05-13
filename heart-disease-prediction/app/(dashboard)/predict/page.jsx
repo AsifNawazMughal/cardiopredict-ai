@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import { patientsApi, predictionsApi } from "../../lib/api";
 import PatientSection from "./_components/PatientSection";
 import ClinicalSection from "./_components/ClinicalSection";
-import ModelSelector from "./_components/ModelSelector";
 import { Activity, AlertCircle } from "lucide-react";
 
 const TEMPLATES = {
@@ -42,7 +41,6 @@ export default function PredictPage() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [model, setModel] = useState("ANN");
   const [newPatient, setNewPatient] = useState({ first_name: "", last_name: "", date_of_birth: "" });
   const [form, setForm] = useState(EMPTY_FORM);
 
@@ -119,7 +117,7 @@ export default function PredictPage() {
         resting_ecg: num(form.resting_ecg), max_heart_rate: num(form.max_heart_rate),
         exercise_angina: num(form.exercise_angina), st_depression: parseFloat(form.st_depression),
         st_slope: num(form.st_slope), vessels_count: num(form.vessels_count),
-        thalassemia: num(form.thalassemia), model_type: model,
+        thalassemia: num(form.thalassemia),
       };
       const result = await predictionsApi.predict(data);
       router.push(`/results/${result.prediction_id}`);
@@ -153,7 +151,6 @@ export default function PredictPage() {
           form={form} set={set}
         />
         <ClinicalSection form={form} set={set}/>
-        <ModelSelector value={model} onChange={setModel}/>
 
         <div className="flex gap-3 justify-end items-center flex-wrap">
           <span className="text-xs text-gray-500 mr-1">Load sample:</span>
