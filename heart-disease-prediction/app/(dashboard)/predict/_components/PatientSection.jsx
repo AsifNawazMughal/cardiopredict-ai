@@ -69,7 +69,7 @@ export default function PatientSection({
             <UserPlus className="w-3.5 h-3.5 text-red-500"/>
             New Patient Details <span className="text-gray-400 font-normal">(filled-in details will be saved as a new patient record)</span>
           </p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Field label="First Name"    type="text" value={newPatient.first_name} onChange={v=>setNew("first_name",v)} placeholder="John" required/>
             <Field label="Last Name"     type="text" value={newPatient.last_name}  onChange={v=>setNew("last_name",v)}  placeholder="Doe"  required/>
             <Field label="Date of Birth" type="date" value={newPatient.date_of_birth} onChange={v=>setNew("date_of_birth",v)} hint="(optional)"/>
@@ -77,7 +77,7 @@ export default function PatientSection({
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <Field label="Age (years)" type="number" value={form.age} onChange={v=>set("age",v)} min="1" max="120" placeholder="e.g. 55" required/>
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">Gender<span className="text-red-600 ml-0.5">*</span></label>

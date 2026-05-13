@@ -130,9 +130,9 @@ export default function PredictPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-4 md:p-6 max-w-4xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2"><Activity className="w-6 h-6 text-red-600"/> New Prediction</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2"><Activity className="w-5 h-5 md:w-6 md:h-6 text-red-600"/> New Prediction</h1>
         <p className="text-gray-500 text-sm mt-1">Enter patient data to run a heart disease risk assessment</p>
       </div>
 

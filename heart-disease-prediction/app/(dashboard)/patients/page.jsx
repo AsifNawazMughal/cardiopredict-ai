@@ -49,13 +49,13 @@ export default function PatientsPage() {
   const set=(k,v)=>setForm(f=>({...f,[k]:v}));
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2"><Users className="w-6 h-6 text-red-600"/> Patients</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2"><Users className="w-5 h-5 md:w-6 md:h-6 text-red-600"/> Patients</h1>
           <p className="text-gray-500 text-sm mt-0.5">Manage your patient records</p>
         </div>
-        <button onClick={openAdd} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+        <button onClick={openAdd} className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors self-start sm:self-auto">
           <Plus className="w-4 h-4"/> Add Patient
         </button>
       </div>
@@ -68,8 +68,8 @@ export default function PatientsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+        <table className="w-full text-sm min-w-[700px]">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>{["#","Name","Age","Gender","Phone","Address","Actions"].map(h=>(
               <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>

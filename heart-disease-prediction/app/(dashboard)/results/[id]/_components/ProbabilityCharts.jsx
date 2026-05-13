@@ -19,13 +19,13 @@ export default function ProbabilityCharts({ probabilities }) {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-5 mb-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-5">
       <div className="bg-white rounded-xl border border-gray-200 p-5">
         <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
           <Activity className="w-4 h-4 text-red-500"/> Risk Probability Distribution
         </h3>
-        <div className="flex items-center gap-4">
-          <div className="w-44 h-44">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="w-36 h-36 md:w-44 md:h-44 shrink-0">
             <Doughnut data={donutData} options={{ cutout:"65%", plugins:{legend:{display:false}}, maintainAspectRatio:true }}/>
           </div>
           <div className="space-y-2 flex-1">

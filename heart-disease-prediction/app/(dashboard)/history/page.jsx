@@ -66,13 +66,13 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2"><Clock className="w-6 h-6 text-red-600"/> Prediction History</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2"><Clock className="w-5 h-5 md:w-6 md:h-6 text-red-600"/> Prediction History</h1>
           <p className="text-gray-500 text-sm mt-0.5">All past heart disease risk assessments</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {selected.length>0 && (
             <Button variant="blue" onClick={handleCompare}>
               <GitCompare className="w-4 h-4"/>
@@ -86,7 +86,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search patient..."
@@ -110,8 +110,8 @@ export default function HistoryPage() {
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+        <table className="w-full text-sm min-w-[900px]">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="w-8 px-4 py-3"/>

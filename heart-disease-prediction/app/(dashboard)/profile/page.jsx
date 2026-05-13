@@ -28,15 +28,15 @@ export default function ProfilePage() {
   const initials = user ? `${(user.first_name||user.username||"D")[0]}${(user.last_name||"")[0]||""}`.toUpperCase() : "DR";
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="p-4 md:p-6 max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2"><UserCog className="w-6 h-6 text-red-600"/> Doctor Profile</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2"><UserCog className="w-5 h-5 md:w-6 md:h-6 text-red-600"/> Doctor Profile</h1>
         <p className="text-gray-500 text-sm mt-0.5">Update your professional information</p>
       </div>
 
       {/* Avatar Card */}
-      <div className="bg-linear-to-r from-red-600 to-rose-600 rounded-2xl p-6 mb-5 text-white flex items-center gap-5">
-        <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-3xl font-bold text-white border-4 border-white/30">
+      <div className="bg-linear-to-r from-red-600 to-rose-600 rounded-2xl p-5 md:p-6 mb-5 text-white flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-5 text-center sm:text-left">
+        <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-3xl font-bold text-white border-4 border-white/30 shrink-0">
           {initials}
         </div>
         <div>
@@ -49,7 +49,7 @@ export default function ProfilePage() {
       {/* Account Info (read-only) */}
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5">
         <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2"><User className="w-4 h-4 text-gray-400"/> Account Details</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><p className="text-xs text-gray-500">Username</p><p className="text-sm font-medium text-gray-900 mt-0.5">{user?.username}</p></div>
           <div><p className="text-xs text-gray-500">Email</p><p className="text-sm font-medium text-gray-900 mt-0.5 flex items-center gap-1"><Mail className="w-3.5 h-3.5 text-gray-400"/>{user?.email}</p></div>
           <div><p className="text-xs text-gray-500">Role</p><p className="text-sm font-medium text-gray-900 mt-0.5 capitalize">{user?.role?.replace("_"," ")}</p></div>
@@ -65,7 +65,7 @@ export default function ProfilePage() {
         {saved && <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex gap-2 text-green-700 text-sm"><CheckCircle2 className="w-4 h-4 mt-0.5"/>Profile saved successfully!</div>}
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field icon={<User className="w-4 h-4"/>} label="First Name" value={form.first_name} onChange={v=>set("first_name",v)} placeholder="John"/>
             <Field label="Last Name" value={form.last_name} onChange={v=>set("last_name",v)} placeholder="Doe"/>
           </div>

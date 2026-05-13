@@ -53,11 +53,11 @@ export default function DashboardPage() {
   const displayName = user?.first_name ? `Dr. ${user.first_name}` : `Dr. ${user?.username||""}`;
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back, {displayName}</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Welcome back, {displayName}</h1>
           <p className="text-gray-500 text-sm mt-0.5">{user?.hospital_name||"Heart Disease Prediction System"}{today ? ` · ${today}` : ""}</p>
         </div>
         <Button onClick={()=>router.push("/predict")}>
@@ -66,7 +66,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
         {[
           {label:"Total Predictions",value:total,icon:Activity,color:"bg-red-100 text-red-600"},
           {label:"Total Patients",value:patientCount,icon:Users,color:"bg-blue-100 text-blue-600"},
@@ -83,7 +83,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-5 mb-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5 mb-5">
         {/* Doughnut */}
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-800 mb-4">Risk Distribution</h3>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Line chart */}
-        <div className="col-span-2 bg-white rounded-xl border border-gray-200 p-5">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-800 mb-4">Confidence Trend (Last 10 Predictions)</h3>
           {lineHistory.length>0 ? (
             <div className="h-44">
@@ -124,33 +124,35 @@ export default function DashboardPage() {
         ) : recent.length===0 ? (
           <div className="text-center py-10 text-gray-400 text-sm">No predictions yet. <button onClick={()=>router.push("/predict")} className="text-red-600 underline">Run first prediction</button></div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                {["Patient","Risk","Confidence","Model","Date",""].map(h=>(
-                  <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {recent.map(h=>{
-                return (
-                  <tr key={h.id} className="border-t border-gray-100 hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{h.patient_name||"Unknown"}</td>
-                    <td className="px-4 py-3"><RiskBadge risk={h.risk_class}/></td>
-                    <td className="px-4 py-3 text-gray-700">{h.confidence}%</td>
-                    <td className="px-4 py-3 text-gray-500">{h.model_used}</td>
-                    <td className="px-4 py-3 text-gray-500">{new Date(h.predicted_at).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">
-                      <button onClick={()=>router.push(`/results/${h.id}`)} className="flex items-center gap-1 text-xs text-red-600 hover:underline">
-                        <Eye className="w-3.5 h-3.5"/> View Report
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[640px]">
+              <thead className="bg-gray-50">
+                <tr>
+                  {["Patient","Risk","Confidence","Model","Date",""].map(h=>(
+                    <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {recent.map(h=>{
+                  return (
+                    <tr key={h.id} className="border-t border-gray-100 hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{h.patient_name||"Unknown"}</td>
+                      <td className="px-4 py-3"><RiskBadge risk={h.risk_class}/></td>
+                      <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{h.confidence}%</td>
+                      <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{h.model_used}</td>
+                      <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{new Date(h.predicted_at).toLocaleDateString()}</td>
+                      <td className="px-4 py-3">
+                        <button onClick={()=>router.push(`/results/${h.id}`)} className="flex items-center gap-1 text-xs text-red-600 hover:underline whitespace-nowrap">
+                          <Eye className="w-3.5 h-3.5"/> View Report
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

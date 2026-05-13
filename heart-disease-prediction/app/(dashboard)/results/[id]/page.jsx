@@ -29,15 +29,15 @@ export default function ResultDetailPage({ params }) {
   const cfg = getRiskConfig(result.risk_class);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-6 no-print">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 no-print">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium self-start">
           <ArrowLeft className="w-4 h-4"/> Back
         </button>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button onClick={() => router.push("/history")} className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
-            <FileText className="w-4 h-4"/> View All History
+            <FileText className="w-4 h-4"/> <span className="hidden sm:inline">View All</span> History
           </button>
           <button onClick={() => exportPdf(result)} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium">
             <Download className="w-4 h-4"/> Export PDF
@@ -55,7 +55,7 @@ export default function ResultDetailPage({ params }) {
 
       <ProbabilityCharts probabilities={result.probabilities}/>
 
-      <div className="grid grid-cols-2 gap-5 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-5">
         {/* Clinical Recommendations */}
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-800 mb-3">Clinical Recommendations</h3>
