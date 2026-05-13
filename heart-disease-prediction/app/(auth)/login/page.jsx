@@ -104,16 +104,21 @@ export default function LoginPage() {
           specialization: form.specialization, hospital_name: form.hospital_name,
           phone: form.phone, license_number: form.license_number,
         });
-        toast.success("Account created successfully");
-        await authApi.login(form.username, form.password);
-        toast.success(`Welcome, Dr. ${form.first_name}!`);
-      } else {
-        const data = await authApi.login(form.username, form.password);
-        toast.success(`Welcome back, ${data.user?.first_name || form.username}!`);
+        router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
+        return;
       }
+      const data = await authApi.login(form.username, form.password);
+      toast.success(`Welcome back, ${data.user?.first_name || form.username}!`);
       router.push("/dashboard");
     } catch (err) {
-      toast.error(err.message || "Something went wrong");
+      const msg = err.message || "Something went wrong";
+      if (msg.toLowerCase().includes("verify your email")) {
+        // Username field may contain an email — pass it along so resend can work.
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.username);
+        router.push(`/verify-email${isEmail ? `?email=${encodeURIComponent(form.username)}` : ""}`);
+        return;
+      }
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

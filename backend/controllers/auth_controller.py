@@ -22,10 +22,15 @@ from jose import jwt
 from datetime import datetime, timedelta
 from typing import Optional
 import os
+import secrets
+import logging
 from dotenv import load_dotenv
 
 from database.models.user import User
 from schemas.auth_schemas import UserCreate, UserProfileUpdate
+from services.email import send_verification_email
+
+log = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -57,11 +62,14 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
 
 def register_user(db: Session, user_data: UserCreate) -> User:
-    """Create a new user account. Raises 400 if username/email already taken."""
+    """Create a new user account and send a verification email.
+    Raises 400 if username/email already taken."""
     if db.query(User).filter(User.username == user_data.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
     if db.query(User).filter(User.email == user_data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
+
+    token = secrets.token_urlsafe(32)
 
     user = User(
         username=user_data.username,
@@ -74,11 +82,64 @@ def register_user(db: Session, user_data: UserCreate) -> User:
         hospital_name=user_data.hospital_name,
         phone=user_data.phone,
         license_number=user_data.license_number,
+        email_verified=False,
+        verification_token=token,
+        verification_token_expires_at=datetime.utcnow() + timedelta(hours=24),
     )
     db.add(user)
     db.commit()
     db.refresh(user)
+
+    try:
+        send_verification_email(
+            to=user.email,
+            name=user.first_name or user.username,
+            token=token,
+        )
+    except Exception as e:
+        # Don't fail registration if email send fails — user can request a resend.
+        log.exception("Failed to send verification email for %s: %s", user.email, e)
+
     return user
+
+
+def verify_email_token(db: Session, token: str) -> User:
+    """Look up a user by verification token and mark them verified.
+    Raises 400 on invalid/expired token."""
+    user = db.query(User).filter(User.verification_token == token).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid verification link")
+    if user.verification_token_expires_at and user.verification_token_expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Verification link has expired. Please register again or request a new one.")
+
+    user.email_verified = True
+    user.verification_token = None
+    user.verification_token_expires_at = None
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def resend_verification_email(db: Session, email: str) -> None:
+    """Generate a fresh token and re-send the verification email.
+    Silently succeeds whether or not the email exists, to avoid enumeration."""
+    user = db.query(User).filter(User.email == email).first()
+    if not user or user.email_verified:
+        return  # don't reveal whether the email exists or is verified
+
+    token = secrets.token_urlsafe(32)
+    user.verification_token = token
+    user.verification_token_expires_at = datetime.utcnow() + timedelta(hours=24)
+    db.commit()
+
+    try:
+        send_verification_email(
+            to=user.email,
+            name=user.first_name or user.username,
+            token=token,
+        )
+    except Exception as e:
+        log.exception("Failed to resend verification email for %s: %s", user.email, e)
 
 
 def check_availability(db: Session, username: Optional[str] = None, email: Optional[str] = None) -> dict:
@@ -103,6 +164,11 @@ def authenticate_user(db: Session, username_or_email: str, password: str) -> Use
         )
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Account is disabled")
+    if not user.email_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Please verify your email before logging in. Check your inbox for the verification link.",
+        )
     return user
 
 

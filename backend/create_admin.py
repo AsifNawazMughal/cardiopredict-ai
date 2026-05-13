@@ -44,6 +44,7 @@ def main():
             existing.hashed_password = hash_password(ADMIN_PASSWORD)
             existing.role = UserRole.admin
             existing.is_active = True
+            existing.email_verified = True
             db.commit()
             print(f"Updated existing admin: {existing.username} ({existing.email})")
             print("  Password reset to the value in ADMIN_PASSWORD.")
@@ -54,6 +55,7 @@ def main():
                 hashed_password=hash_password(ADMIN_PASSWORD),
                 role=UserRole.admin,
                 is_active=True,
+                email_verified=True,
                 first_name="System",
                 last_name="Admin",
             )

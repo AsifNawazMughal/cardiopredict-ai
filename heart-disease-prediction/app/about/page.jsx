@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Heart, Github, ArrowLeft, Activity, Database, Cpu, Layers, FileText, Award, MessageCircle, Mail } from "lucide-react";
+import { Heart, Github, ArrowLeft, Activity, Database, Cpu, FileText, Award, MessageCircle, Mail } from "lucide-react";
 import Footer from "@/components/Footer";
 
 export const dynamic = "force-static";
@@ -117,48 +117,6 @@ export default function AboutPage() {
               the per-column median, and features are standardized with z-score
               normalization before training.
             </p>
-          </section>
-
-          {/* Tech stack */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Layers className="w-6 h-6 text-red-600" /> Tech stack
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <h3 className="font-semibold text-gray-900 mb-2">Frontend</h3>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li>• Next.js 16 (App Router, React Server Components)</li>
-                  <li>• Tailwind CSS</li>
-                  <li>• Chart.js for visualizations</li>
-                  <li>• Deployed on Vercel</li>
-                </ul>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <h3 className="font-semibold text-gray-900 mb-2">Backend</h3>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li>• FastAPI (Python 3.12)</li>
-                  <li>• SQLAlchemy + Alembic migrations</li>
-                  <li>• JWT auth, sqladmin panel</li>
-                  <li>• Deployed on Hugging Face Spaces (Docker)</li>
-                </ul>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <h3 className="font-semibold text-gray-900 mb-2">Data</h3>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li>• PostgreSQL on Supabase (managed)</li>
-                  <li>• Schema versioned with Alembic</li>
-                </ul>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <h3 className="font-semibold text-gray-900 mb-2">ML</h3>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li>• scikit-learn — LogisticRegression</li>
-                  <li>• StandardScaler for feature normalization</li>
-                  <li>• Persisted via pickle, loaded once at startup</li>
-                </ul>
-              </div>
-            </div>
           </section>
 
           {/* Disclaimer */}

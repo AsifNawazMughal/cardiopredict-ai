@@ -10,8 +10,18 @@ from database.models.user import User
 from schemas.auth_schemas import UserCreate, UserResponse, UserProfileUpdate, Token
 from controllers.auth_controller import (
     register_user, authenticate_user, update_user_profile, check_availability,
-    create_access_token, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+    create_access_token, verify_email_token, resend_verification_email,
+    SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 )
+from pydantic import BaseModel, EmailStr
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -47,9 +57,26 @@ def check_availability_route(
     return check_availability(db, username, email)
 
 
-@router.post("/register", response_model=UserResponse, status_code=201)
+@router.post("/register", status_code=201)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
-    return register_user(db, user_data)
+    user = register_user(db, user_data)
+    return {
+        "message": "Registration successful. Please check your email to verify your account.",
+        "email": user.email,
+    }
+
+
+@router.post("/verify-email")
+def verify_email(body: VerifyEmailRequest, db: Session = Depends(get_db)):
+    verify_email_token(db, body.token)
+    return {"message": "Email verified. You can now sign in."}
+
+
+@router.post("/resend-verification", status_code=202)
+def resend_verification(body: ResendVerificationRequest, db: Session = Depends(get_db)):
+    resend_verification_email(db, body.email)
+    # Always 202 — don't reveal whether the email exists
+    return {"message": "If the email exists and is not yet verified, a new link has been sent."}
 
 
 @router.post("/login", response_model=Token)

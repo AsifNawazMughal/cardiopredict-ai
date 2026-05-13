@@ -20,6 +20,12 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     role = Column(Enum(UserRole), default=UserRole.healthcare_professional)
     is_active = Column(Boolean, default=True)
+
+    # Email verification flow
+    email_verified = Column(Boolean, default=False, nullable=False)
+    verification_token = Column(String(100), nullable=True, index=True)
+    verification_token_expires_at = Column(DateTime, nullable=True)
+
     created_at = Column(DateTime, server_default=func.now())
 
     # Doctor profile fields (all nullable for backward compatibility)

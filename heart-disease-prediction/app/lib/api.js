@@ -31,6 +31,8 @@ export const authApi = {
     const data = await res.json(); setToken(data.access_token); saveUser(data.user); return data;
   },
   async register(payload) { return apiFetch("/auth/register", { method: "POST", body: JSON.stringify(payload) }); },
+  async verifyEmail(token) { return apiFetch("/auth/verify-email", { method: "POST", body: JSON.stringify({ token }) }); },
+  async resendVerification(email) { return apiFetch("/auth/resend-verification", { method: "POST", body: JSON.stringify({ email }) }); },
   async checkAvailability({ username, email } = {}) {
     const params = new URLSearchParams();
     if (username) params.append("username", username);
