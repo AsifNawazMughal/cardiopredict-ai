@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { predictionsApi, patientsApi, getUser } from "../../lib/api";
 import { Doughnut, Line } from "react-chartjs-2";
@@ -10,9 +10,14 @@ import { Activity, Users, TrendingUp, AlertTriangle, ArrowRight, Plus, Eye } fro
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
+const noopSubscribe = () => () => {};
+const getTodayClient = () => new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+const getTodayServer = () => "";
+
 export default function DashboardPage() {
   const router = useRouter();
-  const user = getUser();
+  const user = useSyncExternalStore(noopSubscribe, getUser, () => null);
+  const today = useSyncExternalStore(noopSubscribe, getTodayClient, getTodayServer);
   const [history, setHistory] = useState([]);
   const [patientCount, setPatientCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -53,7 +58,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Welcome back, {displayName}</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{user?.hospital_name||"Heart Disease Prediction System"} · {new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})}</p>
+          <p className="text-gray-500 text-sm mt-0.5">{user?.hospital_name||"Heart Disease Prediction System"}{today ? ` · ${today}` : ""}</p>
         </div>
         <Button onClick={()=>router.push("/predict")}>
           <Plus className="w-4 h-4"/> New Prediction

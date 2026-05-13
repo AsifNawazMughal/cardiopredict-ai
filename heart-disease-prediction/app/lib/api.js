@@ -3,7 +3,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export function getToken() { if (typeof window === "undefined") return null; return localStorage.getItem("token"); }
 export function setToken(t) { localStorage.setItem("token", t); }
 export function removeToken() { localStorage.removeItem("token"); localStorage.removeItem("user"); }
-export function getUser() { if (typeof window === "undefined") return null; const u = localStorage.getItem("user"); return u ? JSON.parse(u) : null; }
+let _userCache = { raw: null, parsed: null };
+export function getUser() {
+  if (typeof window === "undefined") return null;
+  const raw = localStorage.getItem("user");
+  if (raw === _userCache.raw) return _userCache.parsed;
+  _userCache = { raw, parsed: raw ? JSON.parse(raw) : null };
+  return _userCache.parsed;
+}
 export function saveUser(u) { localStorage.setItem("user", JSON.stringify(u)); }
 
 async function apiFetch(path, options = {}) {
