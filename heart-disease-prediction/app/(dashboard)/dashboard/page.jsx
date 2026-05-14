@@ -73,10 +73,10 @@ export default function DashboardPage() {
           {label:"High Risk Cases",value:high,icon:AlertTriangle,color:"bg-red-100 text-red-600"},
           {label:"Avg Confidence",value:total?`${Math.round(history.reduce((s,h)=>s+h.confidence,0)/total)}%`:"—",icon:TrendingUp,color:"bg-green-100 text-green-600"},
         ].map(({label,value,icon:Icon,color})=>(
-          <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}><Icon className="w-5 h-5"/></div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{loading?"—":value}</p>
+          <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${color}`}><Icon className="w-4 h-4 sm:w-5 sm:h-5"/></div>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{loading?"—":value}</p>
               <p className="text-xs text-gray-500 mt-0.5">{label}</p>
             </div>
           </div>
