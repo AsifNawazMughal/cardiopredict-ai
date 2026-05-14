@@ -27,13 +27,13 @@ export default function RiskCard({ result }) {
         <p className="text-xs text-gray-500 uppercase tracking-wide">Prediction Result</p>
         <h2 className={`text-2xl md:text-3xl font-bold mt-0.5 ${cfg.text}`}>{cfg.label}</h2>
         <p className="text-gray-600 text-xs md:text-sm mt-1">
-          Confidence: <span className="font-semibold">{result.confidence}%</span> ·
+          Risk Score: <span className="font-semibold">{result.confidence}%</span> ·
           Model: <span className="font-semibold">{result.model_used}</span> ·
           <span> {new Date(result.predicted_at).toLocaleString()}</span>
         </p>
       </div>
       <div className={`text-right px-4 py-3 md:px-5 md:py-4 rounded-xl ${cfg.bg} border ${cfg.border}`}>
-        <p className="text-xs text-gray-500 uppercase tracking-wide">Confidence Score</p>
+        <p className="text-xs text-gray-500 uppercase tracking-wide">Risk Score</p>
         <p className={`text-4xl md:text-5xl font-bold ${cfg.text} mt-1`}>{result.confidence}<span className="text-xl md:text-2xl">%</span></p>
       </div>
     </div>

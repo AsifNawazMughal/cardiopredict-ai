@@ -51,8 +51,10 @@ export default function AboutPage() {
               A doctor enters 13 standard clinical measurements (age, resting blood
               pressure, cholesterol, max heart rate, exercise-induced angina, ST
               depression, etc.) for a patient. The trained model returns a probability
-              over three risk classes (Low, Medium, High), along with a confidence score
-              and recommendation set. Predictions are persisted per-patient so users
+              over three risk classes (Low, Medium, High), a clinical
+              <strong> Risk Score</strong> (probability the patient has any level of
+              disease), and a feature-importance breakdown showing which inputs
+              drove the prediction. Predictions are persisted per-patient so users
               can review history and trends over time.
             </p>
           </section>

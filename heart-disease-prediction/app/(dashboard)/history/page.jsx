@@ -115,7 +115,7 @@ export default function HistoryPage() {
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="w-8 px-4 py-3"/>
-              {["#","Patient","Risk Class","Confidence","Low%","Medium%","High%","Model","Date","Actions"].map(h=>(
+              {["#","Patient","Risk Class","Risk Score","Low%","Medium%","High%","Model","Date","Actions"].map(h=>(
                 <th key={h} className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
               ))}
             </tr>

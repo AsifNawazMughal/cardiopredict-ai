@@ -44,7 +44,7 @@ export default function DashboardPage() {
   const lineData = {
     labels: lineHistory.map(h=>new Date(h.predicted_at).toLocaleDateString("en-GB",{day:"2-digit",month:"short"})),
     datasets:[{
-      label:"Confidence %", data: lineHistory.map(h=>h.confidence),
+      label:"Risk Score %", data: lineHistory.map(h=>h.confidence),
       borderColor:"#dc2626", backgroundColor:"rgba(220,38,38,0.08)", fill:true,
       tension:0.4, pointBackgroundColor:"#dc2626", pointRadius:4,
     }]
@@ -71,7 +71,7 @@ export default function DashboardPage() {
           {label:"Total Predictions",value:total,icon:Activity,color:"bg-red-100 text-red-600"},
           {label:"Total Patients",value:patientCount,icon:Users,color:"bg-blue-100 text-blue-600"},
           {label:"High Risk Cases",value:high,icon:AlertTriangle,color:"bg-red-100 text-red-600"},
-          {label:"Avg Confidence",value:total?`${Math.round(history.reduce((s,h)=>s+h.confidence,0)/total)}%`:"—",icon:TrendingUp,color:"bg-green-100 text-green-600"},
+          {label:"Avg Risk Score",value:total?`${Math.round(history.reduce((s,h)=>s+h.confidence,0)/total)}%`:"—",icon:TrendingUp,color:"bg-green-100 text-green-600"},
         ].map(({label,value,icon:Icon,color})=>(
           <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
             <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${color}`}><Icon className="w-4 h-4 sm:w-5 sm:h-5"/></div>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
 
         {/* Line chart */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-800 mb-4">Confidence Trend (Last 10 Predictions)</h3>
+          <h3 className="font-semibold text-gray-800 mb-4">Risk Score Trend (Last 10 Predictions)</h3>
           {lineHistory.length>0 ? (
             <div className="h-44">
               <Line data={lineData} options={{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:(v)=>`${v}%`}}}}}/>
@@ -128,7 +128,7 @@ export default function DashboardPage() {
             <table className="w-full text-sm min-w-[640px]">
               <thead className="bg-gray-50">
                 <tr>
-                  {["Patient","Risk","Confidence","Model","Date",""].map(h=>(
+                  {["Patient","Risk","Risk Score","Model","Date",""].map(h=>(
                     <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase whitespace-nowrap">{h}</th>
                   ))}
                 </tr>

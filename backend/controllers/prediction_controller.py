@@ -138,10 +138,15 @@ def get_prediction_by_id(db: Session, prediction_id: int, user_id: int) -> dict:
         except Exception:
             feature_contributions = []
 
+    # Risk Score = 1 - P(Low) — probability the patient has any level of disease.
+    # We recompute here from the stored class probabilities so older predictions
+    # (saved before this metric existed) also get the new headline number.
+    risk_score = round((1.0 - (pred.risk_score_low or 0)) * 100, 1)
+
     return {
         "prediction_id": pred.id,
         "risk_class": pred.risk_class.value if pred.risk_class else None,
-        "confidence": round((pred.confidence or 0) * 100, 1),
+        "confidence": risk_score,
         "probabilities": {
             "low": round((pred.risk_score_low or 0) * 100, 1),
             "medium": round((pred.risk_score_medium or 0) * 100, 1),
@@ -175,7 +180,7 @@ def get_history(db: Session, user_id: int, patient_id: Optional[int] = None,
             "patient_id": p.patient_id,
             "patient_name": f"{p.patient.first_name} {p.patient.last_name}" if p.patient else "Unknown",
             "risk_class": p.risk_class.value if p.risk_class else None,
-            "confidence": round((p.confidence or 0) * 100, 1),
+            "confidence": round((1.0 - (p.risk_score_low or 0)) * 100, 1),
             "probability_low": round((p.risk_score_low or 0) * 100, 1),
             "probability_medium": round((p.risk_score_medium or 0) * 100, 1),
             "probability_high": round((p.risk_score_high or 0) * 100, 1),

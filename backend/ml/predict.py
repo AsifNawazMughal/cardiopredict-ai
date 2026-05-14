@@ -127,19 +127,24 @@ class PredictionEngine:
         return items
 
     def predict(self, patient_data: dict) -> dict:
-        """Run a prediction for a new patient and return the risk classification."""
+        """Run a prediction for a new patient and return the risk classification.
+
+        The reported `confidence` is now a *risk score* — the probability the
+        patient has any level of disease (Medium or High), i.e. 1 - P(Low).
+        Always oriented the same direction: bigger number → more concerning.
+        """
         if not self.loaded:
             self.load_models()
 
         features_scaled = self._build_scaled_features(patient_data)
         proba = self.model.predict_proba(features_scaled)[0]
         risk_index = int(np.argmax(proba))
-        confidence = float(np.max(proba))
+        risk_score = 1.0 - float(proba[0])  # P(Medium) + P(High)
 
         return {
             "risk_class": RISK_LABELS[risk_index],
             "risk_color": RISK_COLORS[risk_index],
-            "confidence": round(confidence * 100, 1),
+            "confidence": round(risk_score * 100, 1),
             "probabilities": {
                 "low":    round(float(proba[0]) * 100, 1),
                 "medium": round(float(proba[1]) * 100, 1),

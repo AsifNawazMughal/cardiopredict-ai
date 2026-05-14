@@ -43,7 +43,7 @@ export async function exportPdf(result) {
   doc.text(`${rc} Risk`, margin + 5, y + 20);
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text(`Confidence: ${result.confidence}%`, pageW - margin - 5, y + 10, { align: "right" });
+  doc.text(`Risk Score: ${result.confidence}%`, pageW - margin - 5, y + 10, { align: "right" });
   doc.setFontSize(28);
   doc.setFont("helvetica", "bold");
   doc.text(`${result.confidence}%`, pageW - margin - 5, y + 22, { align: "right" });
