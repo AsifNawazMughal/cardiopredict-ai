@@ -5,6 +5,7 @@ import { predictionsApi } from "../../../lib/api";
 import RiskCard, { getRiskConfig } from "./_components/RiskCard";
 import ProbabilityCharts from "./_components/ProbabilityCharts";
 import HealthParamsGrid from "./_components/HealthParamsGrid";
+import FeatureContributions from "./_components/FeatureContributions";
 import { exportPdf } from "./_components/exportPdf";
 import { ArrowLeft, Download, AlertCircle, FileText, RefreshCw } from "lucide-react";
 
@@ -54,6 +55,11 @@ export default function ResultDetailPage({ params }) {
       <RiskCard result={result}/>
 
       <ProbabilityCharts probabilities={result.probabilities}/>
+
+      <FeatureContributions
+        contributions={result.feature_contributions}
+        riskClass={result.risk_class}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-5">
         {/* Clinical Recommendations */}

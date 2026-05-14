@@ -110,6 +110,34 @@ def get_prediction_by_id(db: Session, prediction_id: int, user_id: int) -> dict:
         raise HTTPException(status_code=404, detail="Prediction not found")
 
     hp = pred.health_parameter
+    health_data = {
+        "age": hp.age, "sex": hp.gender,
+        "chest_pain_type": hp.chest_pain_type,
+        "resting_bp": hp.resting_bp,
+        "cholesterol": hp.cholesterol,
+        "fasting_blood_sugar": hp.fasting_blood_sugar,
+        "resting_ecg": hp.resting_ecg,
+        "max_heart_rate": hp.max_heart_rate,
+        "exercise_angina": hp.exercise_angina,
+        "st_depression": hp.st_depression,
+        "st_slope": hp.st_slope,
+        "vessels_count": hp.vessels_count,
+        "thalassemia": hp.thalassemia,
+    } if hp else {}
+
+    # Recompute feature contributions on the fly — fast for LR, and lets us
+    # show explanations on older predictions that predate this feature.
+    risk_index = {"Low": 0, "Medium": 1, "High": 2}.get(
+        pred.risk_class.value if pred.risk_class else "Low", 0
+    )
+    feature_contributions = []
+    if hp and prediction_engine.loaded:
+        try:
+            scaled = prediction_engine._build_scaled_features(health_data)
+            feature_contributions = prediction_engine._explain(scaled, risk_index)
+        except Exception:
+            feature_contributions = []
+
     return {
         "prediction_id": pred.id,
         "risk_class": pred.risk_class.value if pred.risk_class else None,
@@ -123,24 +151,12 @@ def get_prediction_by_id(db: Session, prediction_id: int, user_id: int) -> dict:
         "predicted_at": pred.predicted_at.isoformat(),
         "patient_id": pred.patient_id,
         "patient_name": f"{pred.patient.first_name} {pred.patient.last_name}" if pred.patient else "Unknown",
-        "health_data": {
-            "age": hp.age, "sex": hp.gender,
-            "chest_pain_type": hp.chest_pain_type,
-            "resting_bp": hp.resting_bp,
-            "cholesterol": hp.cholesterol,
-            "fasting_blood_sugar": hp.fasting_blood_sugar,
-            "resting_ecg": hp.resting_ecg,
-            "max_heart_rate": hp.max_heart_rate,
-            "exercise_angina": hp.exercise_angina,
-            "st_depression": hp.st_depression,
-            "st_slope": hp.st_slope,
-            "vessels_count": hp.vessels_count,
-            "thalassemia": hp.thalassemia,
-        } if hp else {},
+        "health_data": health_data,
+        "feature_contributions": feature_contributions,
         "recommendations": prediction_engine._get_recommendations(
-            {"Low": 0, "Medium": 1, "High": 2}.get(pred.risk_class.value, 0),
-            {"cholesterol": hp.cholesterol if hp else 0, "resting_bp": hp.resting_bp if hp else 0}
-        )
+            risk_index,
+            {"cholesterol": hp.cholesterol if hp else 0, "resting_bp": hp.resting_bp if hp else 0},
+        ),
     }
 
 

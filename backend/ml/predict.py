@@ -17,6 +17,23 @@ MODELS_DIR = os.path.join(os.path.dirname(__file__), "saved_models")
 RISK_LABELS = {0: "Low", 1: "Medium", 2: "High"}
 RISK_COLORS = {0: "green", 1: "yellow", 2: "red"}
 
+# Human-readable labels for the per-feature explanation panel
+FEATURE_LABELS = {
+    "age":      "Age",
+    "sex":      "Sex",
+    "cp":       "Chest pain type",
+    "trestbps": "Resting blood pressure",
+    "chol":     "Cholesterol",
+    "fbs":      "Fasting blood sugar",
+    "restecg":  "Resting ECG",
+    "thalach":  "Max heart rate",
+    "exang":    "Exercise-induced angina",
+    "oldpeak":  "ST depression",
+    "slope":    "ST slope",
+    "ca":       "Major vessels",
+    "thal":     "Thalassemia",
+}
+
 
 class PredictionEngine:
     """Loads the production model and runs predictions. Loaded once at startup."""
@@ -61,35 +78,60 @@ class PredictionEngine:
             print("   Please run: python ml/train_model.py first")
             raise
 
+    _FIELD_MAP = {
+        'age':      'age',
+        'sex':      'sex',
+        'cp':       'chest_pain_type',
+        'trestbps': 'resting_bp',
+        'chol':     'cholesterol',
+        'fbs':      'fasting_blood_sugar',
+        'restecg':  'resting_ecg',
+        'thalach':  'max_heart_rate',
+        'exang':    'exercise_angina',
+        'oldpeak':  'st_depression',
+        'slope':    'st_slope',
+        'ca':       'vessels_count',
+        'thal':     'thalassemia',
+    }
+
+    def _build_scaled_features(self, patient_data: dict):
+        features = []
+        for col in self.feature_columns:
+            api_field = self._FIELD_MAP.get(col, col)
+            value = patient_data.get(api_field, patient_data.get(col, 0))
+            features.append(float(value))
+        features_array = np.array(features).reshape(1, -1)
+        return self.scaler.transform(features_array)
+
+    def _explain(self, features_scaled, risk_index: int) -> list:
+        """Per-feature contribution to the predicted class's logit.
+
+        Works for any linear-model estimator with `coef_` (e.g. LogisticRegression).
+        Returns a list of dicts sorted by absolute impact, with the sign indicating
+        whether the feature pushed risk toward the predicted class (+) or away (-).
+        """
+        coef = getattr(self.model, "coef_", None)
+        if coef is None:
+            return []  # XGBoost would land here — leave the panel empty for now
+        # For multiclass LR with 3 classes, coef_ shape is (3, n_features)
+        contributions = coef[risk_index] * features_scaled[0]
+        items = [
+            {
+                "feature": col,
+                "label":   FEATURE_LABELS.get(col, col),
+                "impact":  float(round(contributions[i], 4)),
+            }
+            for i, col in enumerate(self.feature_columns)
+        ]
+        items.sort(key=lambda x: abs(x["impact"]), reverse=True)
+        return items
+
     def predict(self, patient_data: dict) -> dict:
         """Run a prediction for a new patient and return the risk classification."""
         if not self.loaded:
             self.load_models()
 
-        features = []
-        for col in self.feature_columns:
-            field_map = {
-                'age': 'age',
-                'sex': 'sex',
-                'cp': 'chest_pain_type',
-                'trestbps': 'resting_bp',
-                'chol': 'cholesterol',
-                'fbs': 'fasting_blood_sugar',
-                'restecg': 'resting_ecg',
-                'thalach': 'max_heart_rate',
-                'exang': 'exercise_angina',
-                'oldpeak': 'st_depression',
-                'slope': 'st_slope',
-                'ca': 'vessels_count',
-                'thal': 'thalassemia'
-            }
-            api_field = field_map.get(col, col)
-            value = patient_data.get(api_field, patient_data.get(col, 0))
-            features.append(float(value))
-
-        features_array = np.array(features).reshape(1, -1)
-        features_scaled = self.scaler.transform(features_array)
-
+        features_scaled = self._build_scaled_features(patient_data)
         proba = self.model.predict_proba(features_scaled)[0]
         risk_index = int(np.argmax(proba))
         confidence = float(np.max(proba))
@@ -104,6 +146,7 @@ class PredictionEngine:
                 "high":   round(float(proba[2]) * 100, 1),
             },
             "model_used": self.model_name,
+            "feature_contributions": self._explain(features_scaled, risk_index),
             "recommendations": self._get_recommendations(risk_index, patient_data),
         }
 
