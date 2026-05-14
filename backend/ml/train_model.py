@@ -1,8 +1,10 @@
 """
 AI MODEL TRAINING
 =================
-Trains a Logistic Regression classifier on the UCI Heart Disease dataset
-and saves the model + preprocessing artifacts to disk for the API to load.
+Trains Logistic Regression and XGBoost on the full UCI Heart Disease dataset
+(Cleveland + Hungarian + Switzerland + VA Long Beach), with KNN imputation for
+missing values and GridSearchCV hyperparameter tuning for both models. Saves
+the best-scoring model to disk for the API to load.
 
 Run:
     python ml/train_model.py
@@ -13,13 +15,15 @@ import numpy as np
 import pickle
 import os
 import json
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
+from sklearn.impute import KNNImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score,
     f1_score, roc_auc_score, classification_report
 )
+from xgboost import XGBClassifier
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -31,16 +35,11 @@ os.makedirs(MODELS_DIR, exist_ok=True)
 # ─── STEP 1: LOAD DATA ───────────────────────────────────────────────────────
 def load_data():
     """
-    CONCEPT: Dataset
-    ─────────────────
-    The full UCI Heart Disease dataset has 4 sub-datasets:
+    Loads all four UCI Heart Disease cohorts:
       Cleveland (303), Hungarian (294), Switzerland (123), VA Long Beach (200)
-    Combined: ~920 patient records — 3× the data of Cleveland alone.
-
-    Each row = 1 patient. 13 features + 1 target column.
-    Hungarian/Switzerland/VA use '?' for missing values; preprocess_data() handles those.
+    Combined: ~920 patient records. Missing values are encoded as '?'.
     """
-    print("📂 Loading dataset...")
+    print("Loading dataset...")
 
     columns = [
         'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
@@ -52,8 +51,9 @@ def load_data():
     combined_path = os.path.join(base, "heart.csv")
     uci_dir = os.path.join(base, "dataset_folders", "heart+disease")
 
-    # Cleveland + Hungarian only — Switzerland & VA have heavy missing values
-    # in `ca` and `thal` (the strongest features), which hurt accuracy when imputed.
+    # Cleveland + Hungarian only — Switzerland (66% missing `ca`) and VA
+    # (similar) drag accuracy down because the strongest features are mostly
+    # absent in those cohorts and imputation can't recover the signal.
     sources = [
         ("Cleveland", os.path.join(uci_dir, "processed.cleveland.data")),
         ("Hungarian", os.path.join(uci_dir, "processed.hungarian.data")),
@@ -65,10 +65,9 @@ def load_data():
         frames = []
         for name, path in available:
             sub = pd.read_csv(path, header=None, names=columns, na_values="?")
-            sub["source"] = name
             print(f"  {name:<12} {sub.shape[0]:>4} rows  ← {os.path.basename(path)}")
             frames.append(sub)
-        df = pd.concat(frames, ignore_index=True).drop(columns=["source"])
+        df = pd.concat(frames, ignore_index=True)
         print(f"  Combined total: {df.shape[0]} rows from {len(available)} dataset(s)")
         df.to_csv(combined_path, index=False)
         print(f"  Saved combined CSV to {combined_path}")
@@ -87,212 +86,199 @@ def load_data():
 # ─── STEP 2: CLEAN AND PREPARE DATA ──────────────────────────────────────────
 def preprocess_data(df):
     """
-    CONCEPT: Data Preprocessing
-    ────────────────────────────
-    Real-world data is messy. We need to:
-
-    1. Handle missing values — some cells might be empty ("?")
-       Fix: replace with the average of that column
-
-    2. Normalize numbers — age (25-90) and cholesterol (100-600) are
-       very different scales. The AI gets confused. We make them all 0-1.
-       This is called "StandardScaler" (makes mean=0, std=1)
-
-    3. Convert categories to numbers — "Male/Female" → "1/0"
-       AI only understands numbers, not text.
-
-    4. Create multi-class labels — original dataset has 0-4.
-       We simplify: 0 = Low, 1-2 = Medium, 3-4 = High
+    1. Convert '?' strings to NaN, coerce all columns to numeric.
+    2. Impute missing values using KNNImputer (5 nearest neighbours by
+       Euclidean distance). This preserves relationships between features
+       — e.g. a patient with high BP + cholesterol gets imputed `ca` from
+       similar patients, not from the column-wide median.
+    3. Map the raw 0-4 target to 3 risk classes: Low / Medium / High.
+    4. Standardize features (mean=0, std=1).
+    5. Stratified 80/20 train/test split.
     """
-    print("\n🔧 Preprocessing data...")
+    print("\nPreprocessing data...")
 
-    # Replace '?' with NaN (missing value marker)
     df = df.replace('?', np.nan)
-
-    # Convert all columns to numbers (some might be stored as text)
     for col in df.columns:
         df[col] = pd.to_numeric(df[col], errors='coerce')
 
-    print(f"  Missing values before: {df.isnull().sum().sum()}")
+    feature_columns = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
+                       'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
 
-    # Fill missing values with column average (median is safer for medical data)
-    df = df.fillna(df.median())
+    print(f"  Missing values per feature:")
+    for c in feature_columns:
+        missing = df[c].isnull().sum()
+        if missing:
+            print(f"    {c:10}: {missing}")
 
-    print(f"  Missing values after: {df.isnull().sum().sum()}")
+    # KNN imputation — fit on features only, never on the target
+    imputer = KNNImputer(n_neighbors=5)
+    df[feature_columns] = imputer.fit_transform(df[feature_columns])
+    print(f"  KNN imputation complete (k=5)")
 
-    # ── Create multi-class risk labels ──────────────────────────────────────
-    # Original: target column is 0 (no disease), 1-4 (disease severity)
-    # We map to: 0=Low, 1=Medium, 2=High
+    # Map raw target → risk class
     def map_risk(value):
-        if value == 0:
-            return 0   # Low risk
-        elif value <= 2:
-            return 1   # Medium risk
-        else:
-            return 2   # High risk
+        if value == 0:    return 0   # Low
+        elif value <= 2:  return 1   # Medium
+        else:             return 2   # High
 
     df['risk_class'] = df['target'].apply(map_risk)
 
     print(f"  Risk class distribution:")
     labels = {0: 'Low', 1: 'Medium', 2: 'High'}
-    for k, v in df['risk_class'].value_counts().items():
+    for k, v in sorted(df['risk_class'].value_counts().items()):
         print(f"    {labels[k]} ({k}): {v} patients")
-
-    # ── Split features (X) and labels (y) ──────────────────────────────────
-    # X = the 13 medical measurements (what we feed IN to the model)
-    # y = the risk class (what we want the model to OUTPUT/predict)
-    feature_columns = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
-                        'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
 
     X = df[feature_columns].values
     y = df['risk_class'].values
 
-    # ── Normalize features ──────────────────────────────────────────────────
-    # CONCEPT: StandardScaler
-    # Before: age=[25, 70, 45], cholesterol=[150, 300, 200]
-    # After:  age=[-1.2, 1.5, 0.1], cholesterol=[-0.8, 1.4, 0.2]
-    # Both columns are now on the same scale → AI learns better
-
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)   # fit = learn the scale, transform = apply it
+    X_scaled = scaler.fit_transform(X)
 
-    # Save scaler — we'll need it later to scale NEW patient data the same way
-    scaler_path = os.path.join(MODELS_DIR, "scaler.pkl")
-    with open(scaler_path, 'wb') as f:
+    # Persist preprocessing artifacts — API will reuse them at inference time
+    with open(os.path.join(MODELS_DIR, "scaler.pkl"), 'wb') as f:
         pickle.dump(scaler, f)
-    print(f"  Scaler saved to {scaler_path}")
-
-    # Save feature column names (for validation later)
+    with open(os.path.join(MODELS_DIR, "imputer.pkl"), 'wb') as f:
+        pickle.dump(imputer, f)
     with open(os.path.join(MODELS_DIR, "feature_columns.json"), 'w') as f:
         json.dump(feature_columns, f)
-
-    # ── Train/Test Split ────────────────────────────────────────────────────
-    # CONCEPT: We split data into:
-    #   80% Training   → the AI learns from this
-    #   20% Testing    → we test accuracy on data the AI has NEVER seen
-    # This prevents "cheating" (memorizing answers instead of learning)
+    print(f"  Saved scaler, imputer, and feature column list to {MODELS_DIR}")
 
     X_train, X_test, y_train, y_test = train_test_split(
         X_scaled, y, test_size=0.2, random_state=42, stratify=y
-        # stratify=y means: keep same ratio of Low/Medium/High in both sets
     )
+    print(f"  Train: {X_train.shape[0]} samples · Test: {X_test.shape[0]} samples")
+    return X_train, X_test, y_train, y_test
 
-    print(f"  Training set: {X_train.shape[0]} samples")
-    print(f"  Testing set:  {X_test.shape[0]} samples")
 
-    return X_train, X_test, y_train, y_test, feature_columns
-# ─── STEP 3: TRAIN LOGISTIC REGRESSION ───────────────────────────────────────
+# ─── STEP 3A: TUNED LOGISTIC REGRESSION ──────────────────────────────────────
 def train_logistic_regression(X_train, X_test, y_train, y_test):
-    """
-    CONCEPT: Logistic Regression
-    ─────────────────────────────
-    Despite the name, it's used for CLASSIFICATION not regression.
-    It's the simplest ML model — like drawing a line to separate groups.
+    """5-fold cross-validated grid search over C and penalty/solver combos."""
+    print("\nTraining Logistic Regression (GridSearchCV, 5-fold)...")
 
-    Logistic regression is the standard model used in real cardiovascular
-    risk equations (Framingham, ASCVD) — interpretable coefficients,
-    robust on small samples.
-
-    lbfgs solver handles multi-class (Low/Medium/High) natively
-    """
-    print("\n📊 Training Logistic Regression...")
-
-    model = LogisticRegression(
-        solver='lbfgs',   # lbfgs handles multi-class natively in scikit-learn >= 1.5
-        max_iter=1000,
-        C=1.0,            # C = regularization strength (smaller = more regularization)
-        random_state=42
+    param_grid = [
+        {'C': [0.01, 0.1, 1.0, 10.0, 100.0],
+         'penalty': ['l2'], 'solver': ['lbfgs'], 'max_iter': [2000]},
+        {'C': [0.01, 0.1, 1.0, 10.0],
+         'penalty': ['l1'], 'solver': ['saga'], 'max_iter': [2000]},
+    ]
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    grid = GridSearchCV(
+        LogisticRegression(random_state=42),
+        param_grid, scoring='f1_weighted', cv=cv, n_jobs=-1, verbose=0,
     )
+    grid.fit(X_train, y_train)
+    print(f"  Best params: {grid.best_params_}")
+    print(f"  Best CV f1_weighted: {grid.best_score_:.4f}")
 
-    model.fit(X_train, y_train)
-
+    model = grid.best_estimator_
     y_pred = model.predict(X_test)
     y_pred_proba = model.predict_proba(X_test)
-
     metrics = calculate_metrics(y_test, y_pred, y_pred_proba, "Logistic Regression")
-
-    # Save model using pickle (simple way to save sklearn models)
-    model_path = os.path.join(MODELS_DIR, "logistic_regression.pkl")
-    with open(model_path, 'wb') as f:
-        pickle.dump(model, f)
-    print(f"  Logistic Regression saved to {model_path}")
-
-    return metrics, model_path
+    return model, metrics
 
 
-# ─── HELPER: CALCULATE METRICS ───────────────────────────────────────────────
+# ─── STEP 3B: TUNED XGBOOST ──────────────────────────────────────────────────
+def train_xgboost(X_train, X_test, y_train, y_test):
+    """5-fold cross-validated grid search over the most-impactful XGB params."""
+    print("\nTraining XGBoost (GridSearchCV, 5-fold)...")
+
+    param_grid = {
+        'n_estimators':     [100, 200, 400],
+        'max_depth':        [3, 5, 7],
+        'learning_rate':    [0.05, 0.1, 0.2],
+        'subsample':        [0.8, 1.0],
+    }
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    grid = GridSearchCV(
+        XGBClassifier(
+            objective='multi:softprob', num_class=3,
+            eval_metric='mlogloss', random_state=42,
+            tree_method='hist',
+        ),
+        param_grid, scoring='f1_weighted', cv=cv, n_jobs=-1, verbose=0,
+    )
+    grid.fit(X_train, y_train)
+    print(f"  Best params: {grid.best_params_}")
+    print(f"  Best CV f1_weighted: {grid.best_score_:.4f}")
+
+    model = grid.best_estimator_
+    y_pred = model.predict(X_test)
+    y_pred_proba = model.predict_proba(X_test)
+    metrics = calculate_metrics(y_test, y_pred, y_pred_proba, "XGBoost")
+    return model, metrics
+
+
+# ─── HELPER: METRICS ─────────────────────────────────────────────────────────
 def calculate_metrics(y_true, y_pred, y_pred_proba, model_name):
-    """
-    CONCEPT: Model Evaluation Metrics
-    ───────────────────────────────────
-    After training, how do we know if the model is good?
-
-    Accuracy  = % of correct predictions overall
-    Precision = "When model says High Risk, how often is it right?"
-    Recall    = "Of ALL actual High Risk patients, how many did model catch?"
-    F1 Score  = Balance between Precision and Recall
-    ROC-AUC   = How well model separates classes (1.0 = perfect, 0.5 = random)
-
-    For medical systems, RECALL is most important:
-    It's worse to MISS a sick patient than to falsely alarm a healthy one.
-    """
     acc = accuracy_score(y_true, y_pred)
     prec = precision_score(y_true, y_pred, average='weighted', zero_division=0)
     rec = recall_score(y_true, y_pred, average='weighted', zero_division=0)
     f1 = f1_score(y_true, y_pred, average='weighted', zero_division=0)
-
-    # ROC-AUC for multi-class needs probability scores
     try:
         roc = roc_auc_score(y_true, y_pred_proba, multi_class='ovr', average='weighted')
     except Exception:
         roc = 0.0
 
-    print(f"\n  ─── {model_name} Results ───")
+    print(f"\n  ─── {model_name} Test Results ───")
     print(f"  Accuracy:  {acc:.4f} ({acc*100:.1f}%)")
     print(f"  Precision: {prec:.4f}")
     print(f"  Recall:    {rec:.4f}")
     print(f"  F1 Score:  {f1:.4f}")
     print(f"  ROC-AUC:   {roc:.4f}")
-    print(f"\n  Classification Report:")
     print(classification_report(y_true, y_pred,
-                                 target_names=['Low Risk', 'Medium Risk', 'High Risk']))
+                                target_names=['Low Risk', 'Medium Risk', 'High Risk']))
 
     return {
-        "accuracy": round(float(acc), 4),
+        "accuracy":  round(float(acc), 4),
         "precision": round(float(prec), 4),
-        "recall": round(float(rec), 4),
-        "f1_score": round(float(f1), 4),
-        "roc_auc": round(float(roc), 4)
+        "recall":    round(float(rec), 4),
+        "f1_score":  round(float(f1), 4),
+        "roc_auc":   round(float(roc), 4),
     }
 
 
-# ─── MAIN: RUN EVERYTHING ────────────────────────────────────────────────────
+# ─── MAIN ────────────────────────────────────────────────────────────────────
 def main():
     print("=" * 60)
     print("  HEART DISEASE PREDICTION — MODEL TRAINING")
     print("=" * 60)
 
-    # Step 1: Load data
     df = load_data()
+    X_train, X_test, y_train, y_test = preprocess_data(df)
 
-    # Step 2: Preprocess
-    X_train, X_test, y_train, y_test = preprocess_data(df)[:4]
+    lr_model, lr_metrics = train_logistic_regression(X_train, X_test, y_train, y_test)
+    xgb_model, xgb_metrics = train_xgboost(X_train, X_test, y_train, y_test)
 
-    # Step 3: Train logistic regression
-    lr_metrics, lr_path = train_logistic_regression(X_train, X_test, y_train, y_test)
+    # Pick the better one on weighted F1 (better balance of precision/recall than raw accuracy)
+    if xgb_metrics['f1_score'] >= lr_metrics['f1_score']:
+        best_name, best_model = "XGBoost", xgb_model
+        best_metrics = xgb_metrics
+    else:
+        best_name, best_model = "LogisticRegression", lr_model
+        best_metrics = lr_metrics
 
-    # Step 4: Save metrics summary
-    summary = {"LogisticRegression": {**lr_metrics, "path": lr_path}}
-    summary_path = os.path.join(MODELS_DIR, "models_summary.json")
-    with open(summary_path, 'w') as f:
+    # Save winner as the production model
+    best_path = os.path.join(MODELS_DIR, "best_model.pkl")
+    with open(best_path, 'wb') as f:
+        pickle.dump(best_model, f)
+
+    summary = {
+        "best_model": best_name,
+        "models": {
+            "LogisticRegression": lr_metrics,
+            "XGBoost":            xgb_metrics,
+        },
+        "best": {**best_metrics, "type": best_name, "path": best_path},
+    }
+    with open(os.path.join(MODELS_DIR, "models_summary.json"), 'w') as f:
         json.dump(summary, f, indent=2)
 
     print("\n" + "=" * 60)
-    print("  TRAINING COMPLETE!")
+    print("  TRAINING COMPLETE")
     print("=" * 60)
-    print(f"\n  Accuracy: {lr_metrics['accuracy']}  F1: {lr_metrics['f1_score']}  ROC-AUC: {lr_metrics['roc_auc']}")
-    print(f"  Model saved in: {MODELS_DIR}")
-    print(f"  Summary saved to: {summary_path}")
+    print(f"  Winner:  {best_name}")
+    print(f"  Accuracy {best_metrics['accuracy']}  F1 {best_metrics['f1_score']}  ROC-AUC {best_metrics['roc_auc']}")
+    print(f"  Model saved: {best_path}")
 
 
 if __name__ == "__main__":

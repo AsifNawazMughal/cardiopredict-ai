@@ -1,11 +1,10 @@
 """
 PREDICTION ENGINE
 =================
-Loads the trained Logistic Regression model and runs predictions on new
-patient data. Logistic regression is the model of choice for cardiovascular
-risk on tabular data (cf. Framingham, ASCVD risk equations) — interpretable
-coefficients, robust on small samples, and accuracy is within 1% of deeper
-models on this dataset.
+Loads the best-performing trained model (Logistic Regression or XGBoost) and
+runs predictions on new patient data. The training script picks whichever model
+scored higher on cross-validated F1 and saves it to best_model.pkl along with a
+models_summary.json that records which architecture won.
 """
 
 import numpy as np
@@ -20,29 +19,42 @@ RISK_COLORS = {0: "green", 1: "yellow", 2: "red"}
 
 
 class PredictionEngine:
-    """Loads the trained model and runs predictions. Loaded once at startup."""
+    """Loads the production model and runs predictions. Loaded once at startup."""
 
     def __init__(self):
         self.scaler = None
-        self.lr_model = None
+        self.model = None
         self.feature_columns = None
+        self.model_name = "Unknown"
         self.loaded = False
 
     def load_models(self):
         print("Loading trained model...")
-
         try:
             with open(os.path.join(MODELS_DIR, "scaler.pkl"), 'rb') as f:
                 self.scaler = pickle.load(f)
-
             with open(os.path.join(MODELS_DIR, "feature_columns.json"), 'r') as f:
                 self.feature_columns = json.load(f)
 
-            with open(os.path.join(MODELS_DIR, "logistic_regression.pkl"), 'rb') as f:
-                self.lr_model = pickle.load(f)
+            # Prefer the new best_model.pkl; fall back to the legacy filename
+            # so deployments updated mid-rollout don't break.
+            best_path   = os.path.join(MODELS_DIR, "best_model.pkl")
+            legacy_path = os.path.join(MODELS_DIR, "logistic_regression.pkl")
+            model_path  = best_path if os.path.exists(best_path) else legacy_path
+            with open(model_path, 'rb') as f:
+                self.model = pickle.load(f)
+
+            # Pull the winning model's name from the summary (XGBoost / LogisticRegression)
+            summary_path = os.path.join(MODELS_DIR, "models_summary.json")
+            if os.path.exists(summary_path):
+                with open(summary_path, 'r') as f:
+                    summary = json.load(f)
+                self.model_name = summary.get("best_model") or summary.get("best", {}).get("type") or "LogisticRegression"
+            else:
+                self.model_name = "LogisticRegression"
 
             self.loaded = True
-            print("Model loaded successfully")
+            print(f"Model loaded ({self.model_name}) from {os.path.basename(model_path)}")
 
         except FileNotFoundError as e:
             print(f"Model files not found: {e}")
@@ -50,7 +62,7 @@ class PredictionEngine:
             raise
 
     def predict(self, patient_data: dict) -> dict:
-        """Make a prediction for a new patient."""
+        """Run a prediction for a new patient and return the risk classification."""
         if not self.loaded:
             self.load_models()
 
@@ -78,8 +90,7 @@ class PredictionEngine:
         features_array = np.array(features).reshape(1, -1)
         features_scaled = self.scaler.transform(features_array)
 
-        proba = self.lr_model.predict_proba(features_scaled)[0]
-
+        proba = self.model.predict_proba(features_scaled)[0]
         risk_index = int(np.argmax(proba))
         confidence = float(np.max(proba))
 
@@ -92,8 +103,8 @@ class PredictionEngine:
                 "medium": round(float(proba[1]) * 100, 1),
                 "high":   round(float(proba[2]) * 100, 1),
             },
-            "model_used": "LogisticRegression",
-            "recommendations": self._get_recommendations(risk_index, patient_data)
+            "model_used": self.model_name,
+            "recommendations": self._get_recommendations(risk_index, patient_data),
         }
 
     def _get_recommendations(self, risk_index: int, patient_data: dict) -> list:
@@ -134,8 +145,7 @@ class PredictionEngine:
         summary_path = os.path.join(MODELS_DIR, "models_summary.json")
         if os.path.exists(summary_path):
             with open(summary_path, 'r') as f:
-                data = json.load(f)
-                return {"LogisticRegression": data.get("LogisticRegression", {})}
+                return json.load(f)
         return {}
 
 

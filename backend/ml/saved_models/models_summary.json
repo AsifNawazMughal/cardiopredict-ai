@@ -1,26 +1,28 @@
 {
-  "ANN": {
-    "accuracy": 0.775,
-    "precision": 0.7769,
-    "recall": 0.775,
-    "f1_score": 0.7745,
-    "roc_auc": 0.9168,
-    "path": "/home/asifnawaz/Desktop/cardiopredict-ai/backend/ml/saved_models/ann_model.keras"
+  "best_model": "LogisticRegression",
+  "models": {
+    "LogisticRegression": {
+      "accuracy": 0.7833,
+      "precision": 0.7745,
+      "recall": 0.7833,
+      "f1_score": 0.774,
+      "roc_auc": 0.9054
+    },
+    "XGBoost": {
+      "accuracy": 0.75,
+      "precision": 0.7394,
+      "recall": 0.75,
+      "f1_score": 0.7396,
+      "roc_auc": 0.8584
+    }
   },
-  "LogisticRegression": {
-    "accuracy": 0.7667,
-    "precision": 0.7615,
-    "recall": 0.7667,
-    "f1_score": 0.7638,
-    "roc_auc": 0.9095,
-    "path": "/home/asifnawaz/Desktop/cardiopredict-ai/backend/ml/saved_models/logistic_regression.pkl"
-  },
-  "RandomForest": {
-    "accuracy": 0.7667,
-    "precision": 0.7762,
-    "recall": 0.7667,
-    "f1_score": 0.7462,
-    "roc_auc": 0.9046,
-    "path": "/home/asifnawaz/Desktop/cardiopredict-ai/backend/ml/saved_models/random_forest.pkl"
+  "best": {
+    "accuracy": 0.7833,
+    "precision": 0.7745,
+    "recall": 0.7833,
+    "f1_score": 0.774,
+    "roc_auc": 0.9054,
+    "type": "LogisticRegression",
+    "path": "/home/asifnawaz/Desktop/cardiopredict-ai/backend/ml/saved_models/best_model.pkl"
   }
 }

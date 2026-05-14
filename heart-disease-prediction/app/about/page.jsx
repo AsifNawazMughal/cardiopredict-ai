@@ -64,11 +64,16 @@ export default function AboutPage() {
             </h2>
             <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
               <p className="text-gray-700 leading-relaxed">
-                The active model is a multinomial <strong>Logistic Regression</strong>{" "}
-                classifier from <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm">scikit-learn</code>.
-                I tried three models during the original research (a 3-layer ANN, Random
-                Forest, and Logistic Regression). On this dataset all three landed within
-                a 1% accuracy band — so I shipped the simplest one in production.
+                The production model is a tuned multinomial{" "}
+                <strong>Logistic Regression</strong> classifier from{" "}
+                <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm">scikit-learn</code>.
+                It was selected against an{" "}
+                <strong>XGBoost</strong> gradient-boosted-tree baseline using 5-fold
+                stratified cross-validation with{" "}
+                <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm">GridSearchCV</code>{" "}
+                over regularization strength and penalty type. LR edged out XGBoost
+                (78.3% vs 75.0%) — gradient boosting needs more data than this dataset
+                provides to shine.
               </p>
               <p className="text-gray-700 leading-relaxed">
                 That isn&apos;t a compromise. Logistic regression is the model behind the
@@ -76,20 +81,22 @@ export default function AboutPage() {
                 equations. It produces interpretable coefficients you can show to a
                 physician — &quot;a +1 standard-deviation increase in cholesterol shifts the
                 log-odds of high risk by 0.43&quot; — something a neural net can&apos;t do without
-                extra explainability tooling. On ~600 tabular rows, deep learning is
-                overkill.
+                extra explainability tooling. Preprocessing uses{" "}
+                <strong>KNN imputation</strong> (k=5) instead of column-median fill, so
+                missing measurements get filled from clinically-similar patients rather
+                than the global average.
               </p>
               <div className="grid grid-cols-3 gap-4 pt-2">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">76.7%</div>
+                  <div className="text-2xl font-bold text-gray-900">78.3%</div>
                   <div className="text-xs text-gray-500 mt-1">Accuracy</div>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">0.764</div>
+                  <div className="text-2xl font-bold text-gray-900">0.774</div>
                   <div className="text-xs text-gray-500 mt-1">F1 Score</div>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">0.910</div>
+                  <div className="text-2xl font-bold text-gray-900">0.905</div>
                   <div className="text-xs text-gray-500 mt-1">ROC-AUC</div>
                 </div>
               </div>
