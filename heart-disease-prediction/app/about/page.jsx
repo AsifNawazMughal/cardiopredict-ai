@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Heart, Github, ArrowLeft, Activity, Database, Cpu, FileText, Award, MessageCircle, Mail } from "lucide-react";
+import { Heart, Github, ArrowLeft, Activity, Database, Cpu, FileText, Award, MessageCircle, Mail, Presentation } from "lucide-react";
 import Footer from "@/components/Footer";
 
 export const dynamic = "force-static";
@@ -41,6 +41,28 @@ export default function AboutPage() {
       {/* Main content */}
       <main className="flex-1">
         <div className="max-w-5xl mx-auto px-6 py-12 space-y-12">
+
+          {/* Presentation CTA */}
+          <section>
+            <Link
+              href="/presentation"
+              className="block bg-gradient-to-br from-red-600 to-rose-600 text-white rounded-xl p-5 hover:shadow-xl transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0">
+                  <Presentation className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-base">View the full presentation</p>
+                  <p className="text-sm text-red-100">
+                    15 slides walking through heart-disease basics, every input parameter,
+                    the model, and how predictions are justified.
+                  </p>
+                </div>
+                <span className="text-white text-2xl hidden sm:inline">→</span>
+              </div>
+            </Link>
+          </section>
 
           {/* What it does */}
           <section>
