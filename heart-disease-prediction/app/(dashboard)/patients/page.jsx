@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { patientsApi } from "../../lib/api";
 import { Users, User, Plus, Search, Edit2, Trash2, X, Save, AlertCircle } from "lucide-react";
+import Loading from "@/components/Loading";
 
 const GENDERS = ["Male","Female","Other"];
 
@@ -77,7 +78,7 @@ export default function PatientsPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} className="text-center py-12 text-gray-400">Loading...</td></tr>
+              <tr><td colSpan={7} className="py-12"><Loading center size="lg" label="Loading patients…"/></td></tr>
             ) : patients.length===0 ? (
               <tr><td colSpan={7} className="text-center py-12 text-gray-400">
                 <User className="w-10 h-10 mx-auto mb-2 text-gray-300"/><br/>No patients found. <button onClick={openAdd} className="text-red-600 underline">Add first patient</button>

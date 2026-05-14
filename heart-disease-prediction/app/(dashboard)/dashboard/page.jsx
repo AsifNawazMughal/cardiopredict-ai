@@ -6,6 +6,8 @@ import { Doughnut, Line } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Filler } from "chart.js";
 import RiskBadge from "@/components/RiskBadge";
 import Button from "@/components/Button";
+import Skeleton from "@/components/Skeleton";
+import Loading from "@/components/Loading";
 import { Activity, Users, TrendingUp, AlertTriangle, ArrowRight, Plus, Eye } from "lucide-react";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Filler);
@@ -75,8 +77,12 @@ export default function DashboardPage() {
         ].map(({label,value,icon:Icon,color})=>(
           <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
             <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${color}`}><Icon className="w-4 h-4 sm:w-5 sm:h-5"/></div>
-            <div className="min-w-0">
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">{loading?"—":value}</p>
+            <div className="min-w-0 flex-1">
+              {loading ? (
+                <Skeleton className="h-7 w-16 mb-1.5"/>
+              ) : (
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
+              )}
               <p className="text-xs text-gray-500 mt-0.5">{label}</p>
             </div>
           </div>
@@ -87,7 +93,9 @@ export default function DashboardPage() {
         {/* Doughnut */}
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-800 mb-4">Risk Distribution</h3>
-          {total>0 ? (
+          {loading ? (
+            <Loading center size="lg" label="Loading risk distribution…" className="py-16"/>
+          ) : total>0 ? (
             <>
               <div className="w-36 h-36 mx-auto"><Doughnut data={donutData} options={{cutout:"65%",plugins:{legend:{display:false}},maintainAspectRatio:true}}/></div>
               <div className="mt-3 space-y-1.5">
@@ -105,7 +113,9 @@ export default function DashboardPage() {
         {/* Line chart */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-800 mb-4">Risk Score Trend (Last 10 Predictions)</h3>
-          {lineHistory.length>0 ? (
+          {loading ? (
+            <Loading center size="lg" label="Loading trend…" className="h-44"/>
+          ) : lineHistory.length>0 ? (
             <div className="h-44">
               <Line data={lineData} options={{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:(v)=>`${v}%`}}}}}/>
             </div>
@@ -120,7 +130,7 @@ export default function DashboardPage() {
           <button onClick={()=>router.push("/history")} className="text-sm text-red-600 hover:underline flex items-center gap-1">View All <ArrowRight className="w-3.5 h-3.5"/></button>
         </div>
         {loading ? (
-          <div className="text-center py-10 text-gray-400 text-sm">Loading...</div>
+          <Loading center size="lg" label="Loading recent predictions…" className="py-10"/>
         ) : recent.length===0 ? (
           <div className="text-center py-10 text-gray-400 text-sm">No predictions yet. <button onClick={()=>router.push("/predict")} className="text-red-600 underline">Run first prediction</button></div>
         ) : (

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { predictionsApi } from "../../lib/api";
 import RiskBadge from "@/components/RiskBadge";
 import Button from "@/components/Button";
+import Loading from "@/components/Loading";
 import { Clock, Search, Eye, GitCompare, Download, Filter } from "lucide-react";
 
 export default function HistoryPage() {
@@ -122,7 +123,7 @@ export default function HistoryPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={11} className="text-center py-12 text-gray-400">Loading...</td></tr>
+              <tr><td colSpan={11} className="py-12"><Loading center size="lg" label="Loading history…"/></td></tr>
             ) : filtered.length===0 ? (
               <tr><td colSpan={11} className="text-center py-12 text-gray-400">No predictions found</td></tr>
             ) : filtered.map((h,i)=>{

@@ -8,8 +8,9 @@ import HealthParamsGrid from "./_components/HealthParamsGrid";
 import FeatureContributions from "./_components/FeatureContributions";
 import DiseaseLikelihoods from "./_components/DiseaseLikelihoods";
 import { exportPdf } from "./_components/exportPdf";
-import { ArrowLeft, Download, AlertCircle, FileText, RefreshCw } from "lucide-react";
+import { ArrowLeft, Download, AlertCircle, FileText } from "lucide-react";
 import ReviewWidget from "@/components/ReviewWidget";
+import Loading from "@/components/Loading";
 
 export default function ResultDetailPage({ params }) {
   const { id } = use(params);
@@ -33,7 +34,7 @@ export default function ResultDetailPage({ params }) {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="flex items-center justify-center h-full text-gray-400 p-20"><RefreshCw className="w-8 h-8 animate-spin mr-3"/>Loading result...</div>;
+  if (loading) return <Loading center size="xl" label="Loading result…" className="h-full p-20"/>;
   if (error)   return <div className="p-10 text-red-600 text-center"><AlertCircle className="w-10 h-10 mx-auto mb-2"/>{error}</div>;
   if (!result) return null;
 
