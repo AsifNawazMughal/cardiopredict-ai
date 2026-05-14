@@ -48,20 +48,36 @@ function TitleSlide() {
 function ProblemSlide() {
   return (
     <SlideShell title="The problem" icon={AlertTriangle}>
-      <p className="text-lg text-gray-700 leading-relaxed mb-6">
-        Cardiovascular disease (CVD) is the <strong>leading cause of death worldwide</strong>,
-        responsible for an estimated <strong>17.9 million deaths every year</strong> — about
-        32% of all global deaths (WHO).
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 my-8">
-        <Stat value="17.9M" label="Deaths per year" sub="from CVD globally"/>
-        <Stat value="80%" label="Premature deaths" sub="preventable with early detection"/>
-        <Stat value="13" label="Clinical inputs" sub="needed for screening"/>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        <div className="md:col-span-2">
+          <p className="text-lg text-gray-700 leading-relaxed mb-6">
+            Cardiovascular disease (CVD) is the <strong>leading cause of death worldwide</strong>,
+            responsible for an estimated <strong>17.9 million deaths every year</strong> — about
+            32% of all global deaths (WHO).
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <Stat value="17.9M" label="Deaths/year" sub="from CVD globally"/>
+            <Stat value="80%" label="Preventable" sub="with early detection"/>
+            <Stat value="13" label="Clinical inputs" sub="used by our model"/>
+          </div>
+          <p className="text-sm text-gray-500 italic">
+            Early identification enables lifestyle interventions and treatment before
+            disease progresses. That&apos;s where machine learning helps.
+          </p>
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <figure className="flex flex-col items-center">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Coronary_artery_disease.png/280px-Coronary_artery_disease.png"
+            alt="Diagram of coronary artery disease showing plaque buildup narrowing the artery"
+            className="w-full max-w-[200px] h-auto rounded"
+            loading="lazy"
+          />
+          <figcaption className="text-[10px] text-gray-400 mt-1 text-center italic">
+            CAD plaque buildup · Wikimedia Commons
+          </figcaption>
+        </figure>
       </div>
-      <p className="text-sm text-gray-500 italic">
-        Early identification of at-risk patients enables lifestyle interventions and
-        treatment before disease progresses. That&apos;s where machine learning helps.
-      </p>
     </SlideShell>
   );
 }
@@ -144,27 +160,41 @@ function FeaturesOverviewSlide() {
     <SlideShell title="13 clinical inputs" icon={Activity}>
       <p className="text-sm text-gray-600 mb-4">
         Each prediction takes the same 13 features that a cardiologist would
-        check during a screening visit. We group them into demographics, symptoms,
+        check during a screening visit. Grouped into demographics, symptoms,
         vitals, and diagnostic test results.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {[
-          { c: "Demographics", items: ["Age", "Sex"] },
-          { c: "Symptoms", items: ["Chest pain type", "Exercise-induced angina"] },
-          { c: "Vitals", items: ["Resting blood pressure", "Cholesterol", "Fasting blood sugar", "Max heart rate achieved"] },
-          { c: "Diagnostic tests", items: ["Resting ECG", "ST depression", "ST slope", "Major vessels (fluoroscopy)", "Thalassemia (stress test)"] },
-        ].map((g) => (
-          <div key={g.c} className="bg-gray-50 rounded-lg p-4">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{g.c}</p>
-            <ul className="space-y-1">
-              {g.items.map((i) => (
-                <li key={i} className="text-sm text-gray-800 flex items-start gap-2">
-                  <span className="text-red-500 mt-1">▸</span>{i}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            { c: "Demographics", items: ["Age", "Gender"] },
+            { c: "Symptoms", items: ["Chest pain type", "Exercise-induced angina"] },
+            { c: "Vitals", items: ["Resting blood pressure", "Cholesterol", "Fasting blood sugar", "Max heart rate"] },
+            { c: "Diagnostic tests", items: ["Resting ECG", "ST depression", "ST slope", "Major vessels", "Thalassemia"] },
+          ].map((g) => (
+            <div key={g.c} className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{g.c}</p>
+              <ul className="space-y-0.5">
+                {g.items.map((i) => (
+                  <li key={i} className="text-sm text-gray-800 flex items-start gap-2">
+                    <span className="text-red-500 mt-0.5">▸</span>{i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <figure className="flex flex-col items-center">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Diagram_of_the_human_heart_%28cropped%29.svg/300px-Diagram_of_the_human_heart_%28cropped%29.svg.png"
+            alt="Anatomical diagram of the human heart showing chambers, valves, and major arteries"
+            className="w-full max-w-[220px] h-auto"
+            loading="lazy"
+          />
+          <figcaption className="text-[10px] text-gray-400 mt-1 text-center italic">
+            Heart anatomy — public domain, Wikimedia Commons
+          </figcaption>
+        </figure>
       </div>
     </SlideShell>
   );
@@ -179,7 +209,7 @@ function FeatureDetailsSlide1() {
         why="CVD risk roughly doubles every decade after 40. Key non-modifiable risk factor."
       />
       <FeatureRow
-        name="Sex" abbr="sex"
+        name="Gender" abbr="sex"
         what="0 = female, 1 = male."
         why="Men develop CVD ~10 years earlier than women on average; oestrogen is partially protective pre-menopause."
       />
@@ -227,6 +257,18 @@ function FeatureDetailsSlide2() {
 function FeatureDetailsSlide3() {
   return (
     <SlideShell title="Features explained — diagnostic tests" icon={BarChart3}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <figure className="float-right ml-4 mb-2 hidden md:block">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/SinusRhythmLabels.svg/360px-SinusRhythmLabels.svg.png"
+          alt="ECG waveform showing P wave, QRS complex, ST segment, and T wave"
+          className="w-44 h-auto"
+          loading="lazy"
+        />
+        <figcaption className="text-[10px] text-gray-400 mt-1 text-center italic">
+          ECG waveform · Wikimedia Commons
+        </figcaption>
+      </figure>
       <FeatureRow
         name="Resting ECG" abbr="restecg"
         what="0 normal · 1 ST-T abnormality · 2 LV hypertrophy."
