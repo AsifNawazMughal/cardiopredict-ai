@@ -18,7 +18,7 @@ export default function PatientSection({
   );
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-5">
       <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <User className="w-4 h-4 text-red-500"/> Patient Information
       </h2>
@@ -53,13 +53,13 @@ export default function PatientSection({
       </div>
 
       {selectedPatient && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-between text-sm mb-2">
-          <div>
-            <span className="font-medium text-green-800">{selectedPatient.first_name} {selectedPatient.last_name}</span>
-            <span className="text-green-600 ml-3">{selectedPatient.gender} • DOB: {selectedPatient.date_of_birth} • Age auto-filled</span>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2 text-sm mb-2">
+          <div className="min-w-0">
+            <p className="font-medium text-green-800">{selectedPatient.first_name} {selectedPatient.last_name}</p>
+            <p className="text-green-600 text-xs">{selectedPatient.gender} • DOB: {selectedPatient.date_of_birth} • Age auto-filled</p>
           </div>
           <button type="button" onClick={() => { setSelectedPatient(null); setSearch(""); }}
-            className="text-green-600 hover:text-red-600 text-xs underline">Remove</button>
+            className="text-green-600 hover:text-red-600 text-xs underline shrink-0">Remove</button>
         </div>
       )}
 

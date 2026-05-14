@@ -29,9 +29,11 @@ export default function Field({
   return (
     <div>
       <label className="block text-xs font-medium text-gray-700 mb-1">
-        {label}
-        {required && <span className="text-red-600 ml-0.5">*</span>}
-        {hint && <span className="text-gray-400 ml-1 font-normal">{hint}</span>}
+        <span>
+          {label}
+          {required && <span className="text-red-600 ml-0.5">*</span>}
+        </span>
+        {hint && <span className="block text-gray-400 font-normal mt-0.5">{hint}</span>}
       </label>
       <div className="relative">
         {icon && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</span>}

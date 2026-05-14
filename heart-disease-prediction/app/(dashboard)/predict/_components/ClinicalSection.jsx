@@ -9,12 +9,14 @@ const THAL      = ["Normal","Fixed Defect","Reversible Defect","Unknown"];
 
 export default function ClinicalSection({ form, set }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <Activity className="w-4 h-4 text-red-500"/> Clinical Health Parameters
-        <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Deep Learning Inputs</span>
-      </h2>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-semibold text-gray-800 flex items-center gap-2">
+          <Activity className="w-4 h-4 text-red-500"/> Clinical Health Parameters
+        </h2>
+        <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full whitespace-nowrap">Risk Model Inputs</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
         <Field label="Cholesterol (mg/dl)" type="number" value={form.cholesterol} onChange={v=>set("cholesterol",v)} min="0" max="600" placeholder="e.g. 200" required hint="Normal: <200 mg/dl"/>
         <Field label="Max Heart Rate (bpm)" type="number" value={form.max_heart_rate} onChange={v=>set("max_heart_rate",v)} min="60" max="220" placeholder="e.g. 150" required hint="Normal: 60–100 bpm"/>
         <Field label="ST Depression" type="number" value={form.st_depression} onChange={v=>set("st_depression",v)} step="0.1" min="0" max="10" placeholder="e.g. 1.0" hint="Range: 0.0–6.2"/>
