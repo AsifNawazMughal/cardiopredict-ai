@@ -24,3 +24,29 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Heartbeat loader — two beats per cycle, like a real heart's lub-dub. */
+@keyframes heartbeat {
+  0%   { transform: scale(1); }
+  14%  { transform: scale(1.25); }
+  28%  { transform: scale(1); }
+  42%  { transform: scale(1.18); }
+  70%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Soft pulsing glow ring that travels behind the heart while it beats. */
+@keyframes heart-glow {
+  0%, 100% { opacity: 0.35; transform: scale(0.9); }
+  50%      { opacity: 0;    transform: scale(1.5); }
+}
+
+.animate-heart-glow {
+  animation: heart-glow 1.4s ease-out infinite;
+  transform-origin: center;
+}
