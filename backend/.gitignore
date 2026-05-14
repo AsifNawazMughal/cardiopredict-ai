@@ -16,6 +16,10 @@ env/
 .env.*
 !.env.example
 
+# Loose dataset CSVs at the dataset_folders root — only the UCI heart+disease/
+# subfolder is actually used by training.
+ml/dataset_folders/*.csv
+
 # ML models (large binary files) — keep the active model + preprocessing artifacts tracked
 ml/saved_models/*.pkl
 ml/saved_models/*.h5
