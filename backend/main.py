@@ -24,7 +24,7 @@ from contextlib import asynccontextmanager
 import os
 
 import database.models  # noqa: F401 — ensure models are registered with SQLAlchemy
-from routes import auth, patients, predictions
+from routes import auth, patients, predictions, reviews
 from ml.predict import prediction_engine
 from admin import setup_admin
 
@@ -113,6 +113,7 @@ app.add_middleware(
 app.include_router(auth.router)          # /auth/register, /auth/login, /auth/me
 app.include_router(patients.router)      # /patients/
 app.include_router(predictions.router)   # /predictions/predict, /predictions/history
+app.include_router(reviews.router)        # /reviews/ — star ratings + comments
 
 
 # ─── ADMIN PANEL ──────────────────────────────────────────────────────────────

@@ -42,6 +42,12 @@ export const authApi = {
   logout() { removeToken(); },
 };
 
+export const reviewsApi = {
+  async create({ stars, comment, prediction_id }) {
+    return apiFetch("/reviews/", { method: "POST", body: JSON.stringify({ stars, comment, prediction_id }) });
+  },
+};
+
 export const profileApi = {
   async getMe() { return apiFetch("/auth/me"); },
   async update(data) { const user = await apiFetch("/auth/profile", { method: "PUT", body: JSON.stringify(data) }); saveUser(user); return user; },

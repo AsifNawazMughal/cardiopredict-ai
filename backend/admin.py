@@ -17,6 +17,7 @@ from database.db import engine, SessionLocal
 from database.models.user import User, UserRole
 from database.models.patient import Patient
 from database.models.prediction import Prediction
+from database.models.review import Review
 from controllers.auth_controller import authenticate_user, SECRET_KEY as ADMIN_SECRET
 
 load_dotenv()
@@ -192,6 +193,34 @@ class PatientAdmin(ModelView, model=Patient):
         Patient.created_at: lambda m, a: _fmt_date(m, "created_at"),
         "report":           _patient_report_button,
     }
+
+
+class ReviewAdmin(ModelView, model=Review):
+    name = "Review"
+    name_plural = "Reviews"
+    icon = "fa-solid fa-star"
+
+    column_list = [Review.id, Review.user_id, Review.stars, Review.comment, Review.prediction_id, Review.created_at]
+    column_details_list = [Review.id, Review.user_id, Review.stars, Review.comment, Review.prediction_id, Review.created_at]
+    column_labels = {
+        "user_id":       "User",
+        "prediction_id": "Prediction",
+        "created_at":    "Submitted",
+    }
+    column_sortable_list = [Review.id, Review.stars, Review.created_at]
+    column_default_sort  = ("created_at", True)
+    column_searchable_list = [Review.comment]
+
+    column_formatters = {
+        Review.created_at: lambda m, a: _fmt_date(m, "created_at"),
+    }
+    column_formatters_detail = {
+        Review.created_at: lambda m, a: _fmt_date(m, "created_at"),
+    }
+
+    # Reviews come from the public app — read-only from the admin panel
+    can_create = False
+    can_edit = False
 
 
 # ─── Patient HTML report page ────────────────────────────────────────────────
@@ -374,6 +403,7 @@ def setup_admin(app):
     )
     admin.add_view(UserAdmin)
     admin.add_view(PatientAdmin)
+    admin.add_view(ReviewAdmin)
 
     # Custom HTML report page — lives OUTSIDE /admin/ because sqladmin's
     # mount at /admin/ intercepts every URL underneath it. We re-validate

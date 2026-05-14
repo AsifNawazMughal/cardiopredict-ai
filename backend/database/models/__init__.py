@@ -5,6 +5,7 @@ from database.models.health_parameter import HealthParameter
 from database.models.ml_model import MLModel, ModelType
 from database.models.prediction import Prediction, RiskClass
 from database.models.audit_log import AuditLog
+from database.models.review import Review
 
 __all__ = [
     "User", "UserRole",
@@ -13,4 +14,5 @@ __all__ = [
     "MLModel", "ModelType",
     "Prediction", "RiskClass",
     "AuditLog",
+    "Review",
 ]

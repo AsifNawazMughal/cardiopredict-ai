@@ -6,8 +6,10 @@ import RiskCard, { getRiskConfig } from "./_components/RiskCard";
 import ProbabilityCharts from "./_components/ProbabilityCharts";
 import HealthParamsGrid from "./_components/HealthParamsGrid";
 import FeatureContributions from "./_components/FeatureContributions";
+import DiseaseLikelihoods from "./_components/DiseaseLikelihoods";
 import { exportPdf } from "./_components/exportPdf";
 import { ArrowLeft, Download, AlertCircle, FileText, RefreshCw } from "lucide-react";
+import ReviewWidget from "@/components/ReviewWidget";
 
 export default function ResultDetailPage({ params }) {
   const { id } = use(params);
@@ -15,6 +17,14 @@ export default function ResultDetailPage({ params }) {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showReviewModal, setShowReviewModal] = useState(false);
+
+  function handleExportPdf() {
+    if (!result) return;
+    exportPdf(result);
+    // Pop the review modal a beat after the download dialog
+    setTimeout(() => setShowReviewModal(true), 700);
+  }
 
   useEffect(() => {
     predictionsApi.getById(Number(id))
@@ -40,7 +50,7 @@ export default function ResultDetailPage({ params }) {
           <button onClick={() => router.push("/history")} className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
             <FileText className="w-4 h-4"/> <span className="hidden sm:inline">View All</span> History
           </button>
-          <button onClick={() => exportPdf(result)} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium">
+          <button onClick={handleExportPdf} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium">
             <Download className="w-4 h-4"/> Export PDF
           </button>
         </div>
@@ -60,6 +70,8 @@ export default function ResultDetailPage({ params }) {
         contributions={result.feature_contributions}
         riskClass={result.risk_class}
       />
+
+      <DiseaseLikelihoods probabilities={result.probabilities} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-5">
         {/* Clinical Recommendations */}
@@ -88,6 +100,19 @@ export default function ResultDetailPage({ params }) {
       </div>
 
       <HealthParamsGrid healthData={result.health_data}/>
+
+      <div className="no-print">
+        <ReviewWidget mode="inline" predictionId={result.prediction_id} />
+      </div>
+
+      {showReviewModal && (
+        <ReviewWidget
+          mode="modal"
+          predictionId={result.prediction_id}
+          onClose={() => setShowReviewModal(false)}
+          onSubmitted={() => setTimeout(() => setShowReviewModal(false), 1500)}
+        />
+      )}
     </div>
   );
 }
