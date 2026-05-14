@@ -32,15 +32,65 @@ function FeatureRow({ name, abbr, what, why }) {
 
 function TitleSlide() {
   return (
-    <div className="h-full flex flex-col items-center justify-center text-center px-6">
-      <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-        <Heart className="w-14 h-14 text-white animate-heartbeat" fill="currentColor"/>
+    <div className="relative h-full overflow-hidden flex flex-col items-center justify-center text-center px-6">
+      {/* Background: Unsplash medical photo, dimmed under the gradient */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=1920&q=80"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay pointer-events-none"
+      />
+      {/* Decorative dot grid */}
+      <svg
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full opacity-10 pointer-events-none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <pattern id="hero-dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="white"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#hero-dots)"/>
+      </svg>
+
+      {/* Hero content */}
+      <div className="relative z-10 max-w-3xl">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium text-white/90 mb-6 border border-white/20">
+          <span className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse"/>
+          Live demo · 15 slides
+        </div>
+        <div className="w-24 h-24 mx-auto bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-2xl ring-1 ring-white/30">
+          <Heart className="w-14 h-14 text-white animate-heartbeat" fill="currentColor"/>
+        </div>
+        <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight">CardioPredict AI</h1>
+        <p className="text-xl md:text-2xl text-red-50 max-w-2xl mx-auto mb-8 leading-relaxed">
+          Interpretable machine learning for cardiovascular risk assessment
+        </p>
+        <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+          <Heart className="w-3.5 h-3.5 text-red-200" fill="currentColor"/>
+          <p className="text-sm text-white">A project by <span className="font-semibold">Asif Nawaz Mughal</span></p>
+        </div>
       </div>
-      <h1 className="text-4xl md:text-6xl font-bold text-white mb-3">CardioPredict AI</h1>
-      <p className="text-xl md:text-2xl text-red-100 max-w-2xl mb-6">
-        Interpretable machine learning for cardiovascular risk assessment
-      </p>
-      <p className="text-sm text-red-100/90">A project by <span className="font-semibold">Asif Nawaz Mughal</span></p>
+
+      {/* Animated ECG trace along the bottom */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 1200 100"
+        preserveAspectRatio="none"
+        className="absolute bottom-0 left-0 w-full h-20 pointer-events-none"
+      >
+        <path
+          d="M0 50 L150 50 L170 50 L185 20 L200 80 L215 30 L230 50 L380 50 L400 50 L415 20 L430 80 L445 30 L460 50 L610 50 L630 50 L645 20 L660 80 L675 30 L690 50 L840 50 L860 50 L875 20 L890 80 L905 30 L920 50 L1070 50 L1090 50 L1105 20 L1120 80 L1135 30 L1150 50 L1200 50"
+          stroke="rgba(255,255,255,0.55)"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="ecg-trace"
+        />
+      </svg>
     </div>
   );
 }
@@ -65,16 +115,29 @@ function ProblemSlide() {
             disease progresses. That&apos;s where machine learning helps.
           </p>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <figure className="flex flex-col items-center">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Coronary_artery_disease.png/280px-Coronary_artery_disease.png"
-            alt="Diagram of coronary artery disease showing plaque buildup narrowing the artery"
-            className="w-full max-w-[200px] h-auto rounded"
-            loading="lazy"
-          />
+          <svg viewBox="0 0 200 220" className="w-full max-w-[200px] h-auto" role="img" aria-label="Coronary artery cross-section: a healthy open artery above a narrowed artery with plaque buildup">
+            {/* Healthy artery (top) */}
+            <text x="100" y="18" textAnchor="middle" className="fill-gray-600" fontSize="11" fontWeight="600">Healthy artery</text>
+            <ellipse cx="100" cy="55" rx="70" ry="22" fill="#fecaca"/>
+            <ellipse cx="100" cy="55" rx="55" ry="14" fill="#fee2e2"/>
+            <ellipse cx="100" cy="55" rx="42" ry="9" fill="#ef4444"/>
+            <text x="100" y="95" textAnchor="middle" className="fill-gray-500" fontSize="9">Wide lumen · normal blood flow</text>
+
+            {/* Diseased artery (bottom) */}
+            <text x="100" y="130" textAnchor="middle" className="fill-gray-600" fontSize="11" fontWeight="600">Atherosclerosis (CAD)</text>
+            <ellipse cx="100" cy="167" rx="70" ry="22" fill="#fecaca"/>
+            <ellipse cx="100" cy="167" rx="55" ry="14" fill="#fef3c7"/>
+            {/* Plaque blobs */}
+            <path d="M55 162 Q70 145 90 162 Q75 175 55 172 Z" fill="#fbbf24"/>
+            <path d="M145 162 Q130 145 110 162 Q125 175 145 172 Z" fill="#fbbf24"/>
+            <path d="M70 173 Q85 165 100 173 Q90 180 70 178 Z" fill="#f59e0b"/>
+            {/* Narrow lumen */}
+            <ellipse cx="100" cy="167" rx="12" ry="4" fill="#ef4444"/>
+            <text x="100" y="208" textAnchor="middle" className="fill-gray-500" fontSize="9">Narrowed lumen · restricted flow</text>
+          </svg>
           <figcaption className="text-[10px] text-gray-400 mt-1 text-center italic">
-            CAD plaque buildup · Wikimedia Commons
+            How CAD narrows the arteries
           </figcaption>
         </figure>
       </div>
@@ -183,16 +246,25 @@ function FeaturesOverviewSlide() {
             </div>
           ))}
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <figure className="flex flex-col items-center">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Diagram_of_the_human_heart_%28cropped%29.svg/300px-Diagram_of_the_human_heart_%28cropped%29.svg.png"
-            alt="Anatomical diagram of the human heart showing chambers, valves, and major arteries"
-            className="w-full max-w-[220px] h-auto"
-            loading="lazy"
-          />
+          <svg viewBox="0 0 200 200" className="w-full max-w-[200px] h-auto" role="img" aria-label="Schematic of a heart showing the four chambers and the main feature groups the model uses">
+            {/* Outer heart shape */}
+            <path
+              d="M100 175 C 40 135, 15 85, 35 55 C 50 30, 85 30, 100 55 C 115 30, 150 30, 165 55 C 185 85, 160 135, 100 175 Z"
+              fill="#fee2e2"
+              stroke="#dc2626"
+              strokeWidth="2"
+            />
+            {/* Chambers / vessels suggestion */}
+            <path d="M100 60 L100 165" stroke="#dc2626" strokeWidth="1.5" opacity="0.4"/>
+            <path d="M62 70 Q80 80 95 90" stroke="#dc2626" strokeWidth="1.5" fill="none" opacity="0.5"/>
+            <path d="M138 70 Q120 80 105 90" stroke="#dc2626" strokeWidth="1.5" fill="none" opacity="0.5"/>
+            <circle cx="100" cy="60" r="6" fill="#dc2626"/>
+            {/* Tiny ECG ping inside */}
+            <path d="M50 120 L70 120 L78 105 L86 135 L94 120 L150 120" stroke="#dc2626" strokeWidth="1.5" fill="none" opacity="0.7" strokeLinecap="round"/>
+          </svg>
           <figcaption className="text-[10px] text-gray-400 mt-1 text-center italic">
-            Heart anatomy — public domain, Wikimedia Commons
+            13 inputs feed one heart-risk score
           </figcaption>
         </figure>
       </div>
@@ -257,16 +329,32 @@ function FeatureDetailsSlide2() {
 function FeatureDetailsSlide3() {
   return (
     <SlideShell title="Features explained — diagnostic tests" icon={BarChart3}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <figure className="float-right ml-4 mb-2 hidden md:block">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/SinusRhythmLabels.svg/360px-SinusRhythmLabels.svg.png"
-          alt="ECG waveform showing P wave, QRS complex, ST segment, and T wave"
-          className="w-44 h-auto"
-          loading="lazy"
-        />
+      <figure className="float-right ml-4 mb-2 hidden md:block w-44">
+        <svg viewBox="0 0 220 100" className="w-full h-auto bg-gray-50 rounded border border-gray-200" role="img" aria-label="ECG waveform with P wave, QRS complex, ST segment, and T wave labelled">
+          {/* Grid */}
+          <defs>
+            <pattern id="ecg-grid" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M10 0 L0 0 0 10" fill="none" stroke="#fecaca" strokeWidth="0.4"/>
+            </pattern>
+          </defs>
+          <rect width="220" height="100" fill="url(#ecg-grid)"/>
+          {/* ECG trace */}
+          <path
+            d="M5 55 L40 55 Q48 55 52 48 Q56 55 60 55 L80 55 L85 50 L90 25 L95 80 L100 30 L105 55 L130 55 Q140 40 150 55 L215 55"
+            stroke="#dc2626"
+            strokeWidth="1.7"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Labels */}
+          <text x="48" y="44" textAnchor="middle" fontSize="7" className="fill-gray-700" fontWeight="600">P</text>
+          <text x="92" y="20" textAnchor="middle" fontSize="7" className="fill-gray-700" fontWeight="600">QRS</text>
+          <text x="118" y="50" textAnchor="middle" fontSize="7" className="fill-gray-700" fontWeight="600">ST</text>
+          <text x="145" y="36" textAnchor="middle" fontSize="7" className="fill-gray-700" fontWeight="600">T</text>
+        </svg>
         <figcaption className="text-[10px] text-gray-400 mt-1 text-center italic">
-          ECG waveform · Wikimedia Commons
+          Normal sinus rhythm
         </figcaption>
       </figure>
       <FeatureRow
@@ -480,23 +568,44 @@ function DemoSlide() {
 
 function ThankYouSlide() {
   return (
-    <div className="h-full flex flex-col items-center justify-center text-center px-6">
-      <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
-        <Heart className="w-12 h-12 text-white animate-heartbeat" fill="currentColor"/>
+    <div className="relative h-full overflow-hidden flex flex-col items-center justify-center text-center px-6">
+      {/* Subtle dot grid matching the title slide */}
+      <svg aria-hidden="true" className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="thanks-dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="white"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#thanks-dots)"/>
+      </svg>
+
+      <div className="relative z-10 max-w-xl">
+        <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-2xl ring-1 ring-white/30">
+          <Heart className="w-12 h-12 text-white animate-heartbeat" fill="currentColor"/>
+        </div>
+        <h2 className="text-5xl md:text-6xl font-bold text-white mb-3 tracking-tight">Thank you</h2>
+        <p className="text-lg text-red-100 mb-8">Questions, feedback, or collaboration — get in touch.</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="https://wa.me/923026678305" target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-white text-red-600 px-5 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition-colors shadow-lg">
+            <MessageCircle className="w-4 h-4"/> WhatsApp +92 302 6678305
+          </a>
+          <a href="https://github.com/AsifNawazMughal" target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-md text-white border border-white/30 px-5 py-2.5 rounded-lg font-semibold hover:bg-white/20 transition-colors">
+            <Github className="w-4 h-4"/> GitHub
+          </a>
+        </div>
+        <p className="text-xs text-red-100/80 mt-8 italic">— Asif Nawaz Mughal</p>
       </div>
-      <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">Thank you</h2>
-      <p className="text-lg text-red-100 mb-8 max-w-xl">Questions, feedback, or collaboration — get in touch.</p>
-      <div className="flex flex-col sm:flex-row gap-3">
-        <a href="https://wa.me/923026678305" target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-white text-red-600 px-5 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition-colors">
-          <MessageCircle className="w-4 h-4"/> WhatsApp +92 302 6678305
-        </a>
-        <a href="https://github.com/AsifNawazMughal" target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-white/10 text-white border border-white/30 px-5 py-2.5 rounded-lg font-semibold hover:bg-white/20 transition-colors">
-          <Github className="w-4 h-4"/> GitHub
-        </a>
-      </div>
-      <p className="text-xs text-red-100/80 mt-8 italic">— Asif Nawaz Mughal</p>
+
+      {/* Matching ECG trace at the bottom for symmetry with the title slide */}
+      <svg aria-hidden="true" viewBox="0 0 1200 100" preserveAspectRatio="none"
+        className="absolute bottom-0 left-0 w-full h-20 pointer-events-none">
+        <path
+          d="M0 50 L150 50 L170 50 L185 20 L200 80 L215 30 L230 50 L380 50 L400 50 L415 20 L430 80 L445 30 L460 50 L610 50 L630 50 L645 20 L660 80 L675 30 L690 50 L840 50 L860 50 L875 20 L890 80 L905 30 L920 50 L1070 50 L1090 50 L1105 20 L1120 80 L1135 30 L1150 50 L1200 50"
+          stroke="rgba(255,255,255,0.55)" strokeWidth="2" fill="none"
+          strokeLinecap="round" strokeLinejoin="round" className="ecg-trace"/>
+      </svg>
     </div>
   );
 }

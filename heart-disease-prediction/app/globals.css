@@ -50,3 +50,16 @@ body {
   animation: heart-glow 1.4s ease-out infinite;
   transform-origin: center;
 }
+
+/* ECG trace that draws itself across the screen, used on the hero slide. */
+.ecg-trace {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: ecg-draw 4s linear infinite;
+}
+
+@keyframes ecg-draw {
+  0%   { stroke-dashoffset: 1400; }
+  60%  { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -1400; }
+}
